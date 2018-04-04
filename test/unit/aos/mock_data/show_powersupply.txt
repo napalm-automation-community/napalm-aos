@@ -1,0 +1,5 @@
+             Total     PS
+Chassis/PS   Power     Type     Status   Location
+-----------+---------+--------+--------+-----------
+ 1/1         150       AC       UP       Internal
+    Total   150 

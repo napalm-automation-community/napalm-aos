@@ -1,0 +1,11 @@
+PING 10.1.2.93 (10.1.2.93) 56(84) bytes of data.
+64 bytes from 10.1.2.93: icmp_seq=1 ttl=64 time=0.182 ms
+64 bytes from 10.1.2.93: icmp_seq=2 ttl=64 time=0.116 ms
+64 bytes from 10.1.2.93: icmp_seq=3 ttl=64 time=0.121 ms
+64 bytes from 10.1.2.93: icmp_seq=4 ttl=64 time=0.154 ms
+64 bytes from 10.1.2.93: icmp_seq=5 ttl=64 time=0.122 ms
+
+--- 10.1.2.93 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4995ms
+rtt min/avg/max/mdev = 0.116/0.139/0.182/0.025 ms
+

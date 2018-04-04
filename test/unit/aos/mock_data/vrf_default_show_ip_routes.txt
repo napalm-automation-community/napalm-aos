@@ -1,0 +1,9 @@
+
+ + = Equal cost multipath routes
+ Total 3 routes
+
+  Dest Address       Gateway Addr        Age        Protocol 
+------------------+-------------------+----------+-----------
+  10.0.1.0/24          10.0.1.1             2d23h   LOCAL     
+  1.0.4.0/24          10.0.1.2             2d22h   IBGP      
+  127.0.0.1/32         127.0.0.1            2d23h   LOCAL     

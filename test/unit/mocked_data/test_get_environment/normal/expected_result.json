@@ -1,0 +1,26 @@
+{
+    "power": {
+        "1/1": {
+            "capacity": 150.0,
+            "status": true,
+            "output": 0.0
+        }
+    },
+    "temperature": {
+        "1/CMMA": {
+            "is_critical": false,
+            "is_alert": false,
+            "temperature": 51.0
+        }
+    },
+    "fans": {},
+    "cpu": {
+        "Slot  1/ 1": {
+            "%usage": 16.0
+        }
+    },
+    "memory": {
+        "used_ram": 0,
+        "available_ram": 0
+    }
+}

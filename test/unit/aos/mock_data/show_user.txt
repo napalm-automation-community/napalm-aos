@@ -1,0 +1,50 @@
+User name = test,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = ,
+  Read/Write for families = file ssh ,
+  Snmp allowed     = NO
+  Console-Only    = Disabled
+User name = admin,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = All ,
+  Snmp allowed     = NO
+  Console-Only    = Disabled
+User name = default (*),
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = None,
+  Snmp allowed     = NO
+  Console-Only    = Disabled,
+(*)Note:
+  The default user is not an active user account.
+  It constains the default user account settings,
+  for new user accounts.
+
+User name = ftpUser,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = All ,
+  Snmp allowed     = YES,
+  Snmp authentication     = NONE,
+  Snmp encryption     = NONE
+  Console-Only    = Disabled
+User name = omnivista,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = All ,
+  Snmp allowed     = YES,
+  Snmp authentication     = NONE,
+  Snmp encryption     = NONE
+  Console-Only    = Disabled

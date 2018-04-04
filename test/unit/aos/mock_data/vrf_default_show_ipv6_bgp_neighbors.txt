@@ -1,0 +1,5 @@
+Legends: Nbr = Neighbor
+         As  = Autonomous System
+Nbr address                                    As          Admin state Oper state   BGP Id          Up/Down     BFD Status
+----------------------------------------------+-----------+-----------+------------+---------------+-----------+----------
+2001::1                                        1           disabled    idle         0.0.0.0         00h:00m:00s disabled   

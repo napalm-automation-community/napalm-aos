@@ -1,0 +1,7 @@
+Network address          = 1.0.4.0,
+Network mask             = 255.255.255.0,
+Network admin state      = enabled,
+Network oper state       = active,
+Network metric           = 0,
+Network local preference = 0,
+Network community string = 2914:1234 2914:5678

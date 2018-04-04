@@ -1,0 +1,33 @@
+{
+    "success": {
+        "rtt_max": 0.182,
+        "rtt_min": 0.116,
+        "packet_loss": 0,
+        "probes_sent": 5,
+        "results": [
+            {
+                "ip_address": "10.1.2.93",
+                "rtt": 0.182
+            },
+            {
+                "ip_address": "10.1.2.93",
+                "rtt": 0.116
+            },
+            {
+                "ip_address": "10.1.2.93",
+                "rtt": 0.121
+            },
+            {
+                "ip_address": "10.1.2.93",
+                "rtt": 0.154
+            },
+            {
+                "ip_address": "10.1.2.93",
+                "rtt": 0.122
+            }
+        ],
+        "rtt_avg": 0.139,
+        "rtt_stddev": 0.025
+    }
+}
+

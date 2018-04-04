@@ -1,0 +1,35 @@
+ Chas/                   DETECTED-VALUES         CONFIGURED-VALUES    
+ Slot/   Admin  Auto  Speed   Duplex  Pause   Speed   Duplex  Pause  Link
+ Port    Status Nego  (Mbps)                  (Mbps)                 Trap  EEE
+--------+------+----+--------+------+-------+--------+------+-------+-----+---
+ 1/1/1      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/2      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/3      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/4      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/5      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/6      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/7      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/8      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/9      en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/10     en    en    1000   Full     -      Auto    Auto     -     dis  dis
+ 1/1/11     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/12     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/13     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/14     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/15     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/16     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/17     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/18     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/19     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/20     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/21     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/22     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/23     en    en     -      -       -      Auto    Auto     -     dis  dis
+ 1/1/24     en    en    1000   Full     -      Auto    Auto     -     dis  dis
+ 1/1/25     en   dis     -      -       -     10000    Full     -     dis  dis
+ 1/1/26     en   dis     -      -       -     10000    Full     -     dis  dis
+ 1/1/27     en   dis     -      -       -     10000    Full     -     dis  dis
+ 1/1/28     en   dis     -      -       -     10000    Full     -     dis  dis
+ 1/1/29     en   dis     -      -       -     21000    Full     -     dis  dis
+ 1/1/30     en   dis     -      -       -     21000    Full     -     dis  dis
+

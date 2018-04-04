@@ -1,0 +1,13 @@
+Remote LLDP nearest-bridge Agents on Local Port 2/1/1:
+
+    Chassis e8:e7:32:a2:ab:08, Port 1001:
+      Remote ID                   = 1,
+      Chassis Subtype             = 4 (MAC Address),
+      Port Subtype                = 7 (Locally assigned),
+      Port Description            = Alcatel-Lucent 1/1,
+      System Name                 = switch96,
+      System Description          = Alcatel-Lucent OS6850E-P24 6.4.6.225.R01 Service Release, December 07, 2014.,
+      Capabilities Supported      = Bridge Router,
+      Capabilities Enabled        = Bridge Router,
+      Management IP Address       = 172.16.92.96
+

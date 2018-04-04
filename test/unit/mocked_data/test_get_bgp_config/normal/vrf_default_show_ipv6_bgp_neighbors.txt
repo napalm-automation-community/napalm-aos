@@ -1,0 +1,11 @@
+Legends: Nbr = Neighbor
+         As  = Autonomous System
+Nbr address     As          Admin state Oper state   BGP Id          Up/Down     BFD Status
+---------------+-----------+-----------+------------+---------------+-----------+----------
+
+-> vrf default show ipv6 bgp neighbors
+Legends: Nbr = Neighbor
+         As  = Autonomous System
+Nbr address                                    As          Admin state Oper state   BGP Id          Up/Down     BFD Status
+----------------------------------------------+-----------+-----------+------------+---------------+-----------+----------
+

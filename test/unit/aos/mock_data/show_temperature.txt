@@ -1,0 +1,4 @@
+Chassis/Device | Current |  Range  | Danger | Thresh |  Status
+---------------+---------+---------+--------+--------+-----------------
+ 1/CMMA            47       15-82      82       68     UNDER THRESHOLD
+ 2/CMMA            44       15-72      72       64     UNDER THRESHOLD

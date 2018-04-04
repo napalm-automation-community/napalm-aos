@@ -1,0 +1,64 @@
+User name = abc,
+  Password expiration     = None,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = ,
+  Read/Write for families = system vlan ,
+  Snmp allowed     = NO
+  Console-Only    = Disabled
+User name = test,
+  Password expiration     = None,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = None,
+  Snmp allowed     = NO
+  Console-Only    = Disabled
+User name = admin,
+  Password expiration     = None,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = All ,
+  Snmp allowed     = NO
+  Console-Only    = Disabled
+User name = test2,
+  Password expiration     = None,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = All ,
+  Snmp allowed     = YES,
+  Snmp authentication     = MD5,
+  Snmp encryption     = DES
+  Console-Only    = Disabled
+User name = public,
+  Password expiration     = None,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = All ,
+  Snmp allowed     = YES,
+  Snmp authentication     = NONE,
+  Snmp encryption     = NONE
+  Console-Only    = Disabled
+User name = default (*),
+  Password expiration     = None,
+  Password allow to be modified date     = None,
+  Account lockout     = None,
+  Password bad attempts     = 0,
+  Read Only for domains   = None,
+  Read/Write for domains  = None,
+  Snmp allowed     = NO
+  Console-Only    = Disabled,
+(*)Note:
+  The default user is not an active user account.
+  It constains the default user account settings,
+  for new user accounts.
+
