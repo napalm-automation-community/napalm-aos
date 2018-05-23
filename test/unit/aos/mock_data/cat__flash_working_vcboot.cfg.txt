@@ -1,0 +1,284 @@
+!========================================!
+! File: /flash/working/vcboot.cfg        !
+!========================================!
+! Chassis:
+system name "Rack7_TOR-VC"
+system contact "Richard Tran x2856-4614"
+system location "Calabasas SW Eng Lab"
+
+! Configuration:
+configuration error-file-limit 2
+
+! Capability Manager:
+! Multi-Chassis:
+! Virtual Flow Control:
+! LFP: 
+! Interface:
+interfaces port 1/1/22 admin-state disable
+
+! Port_Manager: 
+! Link Aggregate:
+linkagg static agg 11 size 2 admin-state enable 
+linkagg lacp agg 100 size 2 admin-state enable 
+linkagg lacp agg 100 actor admin-key 12345
+linkagg static agg 101 size 2 admin-state enable 
+linkagg static agg 111 size 2 admin-state enable 
+
+! VLAN:
+vlan 1 admin-state enable
+vlan 101-103 admin-state enable
+vlan 101 members port 1/1/10 tagged
+vlan 102 members port 1/1/10 tagged
+vlan 103 members port 1/1/10 tagged
+
+! PVLAN:
+! Spanning Tree:
+spantree mode flat 
+spantree vlan 1 admin-state disable 
+spantree vlan 101 admin-state enable 
+spantree vlan 102 admin-state enable 
+spantree vlan 103 admin-state enable 
+spantree vlan 4000 admin-state disable 
+
+! DA-UNP:
+! Bridging:
+mac-learning aging-time 99999
+
+! Port Mirroring:
+! Port Mapping:
+! IP:
+ip interface master emp address 10.255.76.162 mask 255.255.255.0
+
+! IPv6:
+! IPSec:
+! IPMS:
+! AAA:
+aaa authentication default "local" 
+aaa authentication console "local" 
+aaa authentication telnet "local" 
+aaa authentication ftp "local" 
+aaa authentication http "local" 
+aaa authentication snmp "local" 
+aaa authentication ssh "local" 
+
+aaa tacacs command-authorization disable
+
+! NTP:
+ntp client admin-state enable
+
+! QOS:
+! Policy Manager:
+! VLAN Stacking:
+! ERP:
+erp-ring 1 port1 linkagg 100 port2 1/1/13 service-vlan 10 level 1
+erp-ring 1 rpl-node linkagg 100
+erp-ring 1 wait-to-restore-timer 1
+
+! MVRP:
+mvrp linkagg 11 enable
+mvrp maximum-vlan 4000
+
+! LLDP:
+lldp nearest-bridge chassis lldpdu disable
+lldp non-tpmr chassis lldpdu disable
+lldp nearest-customer chassis lldpdu disable
+
+! UDLD:
+! Server Load Balance:
+! High Availability Vlan:
+! Session Manager:
+session cli timeout 9999
+session prompt default "Rack7_TOR-VC->"
+session login-timeout 600
+session xon-xoff enable
+
+! Web:
+! Trap Manager:
+! Health Monitor:
+! System Service:
+no swlog duplicate-detect
+swlog syslog-facility-id 0
+swlog appid SWLOG subapp all level off
+swlog appid PMD subapp all level off
+swlog appid ChassisSupervisor subapp all level off
+swlog appid flashManager subapp all level off
+swlog appid MIP_GATEWAY subapp all level off
+swlog appid ConfigManager subapp all level off
+swlog appid capManCmm subapp all level off
+swlog appid vc_licManager subapp all level off
+swlog appid vcmCmm subapp all level off
+swlog appid SSAPP subapp all level off
+swlog appid portMgrCmm subapp all level off
+swlog appid isisVc subapp all level off
+swlog appid vfcm subapp all level off
+swlog appid kmCmm subapp all level off
+swlog appid intfCmm subapp all level off
+swlog appid dafcCmm subapp all level off
+swlog appid linkAggCmm subapp all level off
+swlog appid VlanMgrCmm subapp all level debug3
+swlog appid ipmscmm subapp all level off
+swlog appid pvlanCmm subapp all level off
+swlog appid isis_spb_0 subapp all level off
+swlog appid stpCmm subapp all level off
+swlog appid vcspCmm subapp all level off
+swlog appid AGCMM subapp all level off
+swlog appid slCmm subapp all level off
+swlog appid mirMonSFlowCmm subapp all level off
+swlog appid portMapCmm subapp all level off
+swlog appid ipv4 subapp all level off
+swlog appid ipv6 subapp all level off
+swlog appid rcd subapp all level off
+swlog appid ipsecSys subapp all level off
+swlog appid ipsec subapp all level off
+swlog appid NTP subapp all level off
+swlog appid udpRelay subapp all level off
+swlog appid zcCmm subapp all level off
+swlog appid remoteConfig subapp all level off
+swlog appid AAA subapp all level off
+swlog appid qosCmm subapp all level off
+swlog appid vstkCmm subapp all level off
+swlog appid eoamCmm subapp all level off
+swlog appid erpCmm subapp all level off
+swlog appid slb subapp all level off
+swlog appid havlanCmm subapp all level off
+swlog appid dhlCmm subapp all level off
+swlog appid svcCmm subapp all level off
+swlog appid evbCmm subapp all level off
+swlog appid SES subapp all level off
+swlog appid rmon subapp all level off
+swlog appid WEBVIEW subapp all level off
+swlog appid trapmgr subapp all level off
+swlog appid radCli subapp all level off
+swlog appid ldapClientCmm subapp all level off
+swlog appid tacClientCmm subapp all level off
+swlog appid healthCmm subapp all level off
+swlog appid lldpCmm subapp all level off
+swlog appid udldCmm subapp all level off
+swlog appid mpls subapp all level off
+swlog appid SNMP subapp all level off
+swlog appid csEventMonitor subapp all level off
+swlog appid bfdcmm subapp all level off
+swlog appid grm subapp all level off
+swlog appid mvrpCmm subapp all level off
+swlog appid dhcp6r subapp all level off
+swlog appid messageService subapp all level off
+swlog appid activeLeaseService subapp all level off
+swlog appid dhcpv6Srv subapp all level off
+swlog appid dhcpSrv subapp all level off
+swlog appid saaCmm subapp all level off
+swlog appid appfpCmm subapp all level off
+swlog appid fipsCmm subapp all level off
+swlog appid qmrCmm subapp all level off
+swlog appid ofcmm subapp all level off
+swlog appid ovcCmm subapp all level off
+swlog appid vmsn_cmm subapp all level off
+swlog appid snmp_getuser subapp all level off
+swlog appid iprm_0 subapp all level off
+swlog appid vrrp_0 subapp all level off
+swlog appid capManNi subapp all level off
+swlog appid vcmNi subapp all level off
+swlog appid bcmd subapp all level off
+swlog appid bcd subapp all level off
+swlog appid mcipcd subapp all level off
+swlog appid capManSig subapp all level off
+swlog appid portMgrNi subapp all level off
+swlog appid vfcn subapp all level off
+swlog appid intfNi subapp all level off
+swlog appid dafcNi subapp all level off
+swlog appid linkAggNi subapp all level off
+swlog appid VlanMgrNi subapp all level debug3
+swlog appid stpNi subapp all level off
+swlog appid vcspNi subapp all level off
+swlog appid erpNi subapp all level off
+swlog appid vstkNi subapp all level off
+swlog appid dhlNi subapp all level off
+swlog appid slNi subapp all level off
+swlog appid healthNi subapp all level off
+swlog appid ipni subapp all level off
+swlog appid ip6ni subapp all level off
+swlog appid mirMonSFlowNi subapp all level off
+swlog appid portMapNi subapp all level off
+swlog appid qosNi subapp all level off
+swlog appid ipmsni subapp all level off
+swlog appid evbNi subapp all level off
+swlog appid lldpNi subapp all level off
+swlog appid udldNi subapp all level off
+swlog appid AGNI subapp all level off
+swlog appid bfdni subapp all level off
+swlog appid nipktrly subapp all level off
+swlog appid mvrpNi subapp all level off
+swlog appid loamNi subapp all level off
+swlog appid eoamNi subapp all level off
+swlog appid svcNi subapp all level off
+swlog appid appfpNi subapp all level off
+swlog appid fipsNi subapp all level off
+swlog appid ofni subapp all level off
+swlog appid udpRelayNi subapp all level off
+swlog appid zcNi subapp all level off
+swlog appid vmsn_ni subapp all level off
+system timezone PST
+
+! SNMP:
+snmp security no-security
+snmp community-map mode enable
+snmp community-map hash-key 2afb1c2035338a93 user "public" enable
+
+! BFD:
+! IP Route Manager:
+ip static-route 10.255.0.0/16 gateway 10.255.76.1 metric 1 
+ip static-route 128.251.0.0/16 gateway 10.255.76.1 metric 1 
+ip static-route 135.115.0.0/16 gateway 10.255.76.1 metric 1 
+ip static-route 198.206.0.0/16 gateway 10.255.76.1 metric 1 
+
+! VRRP:
+ip load vrrp
+
+! UDP Relay:
+! RIP:
+! OSPF:
+! IP Multicast:
+! DVMRP:
+! IPMR:
+! RIPng:
+! OSPF3:
+! BGP:
+! ISIS:
+! Netsec:
+! Module:
+! LAN Power:
+! RDP:
+! DHL:
+! Ethernet-OAM:
+ethoam domain foo format string level 1
+
+! SAA:
+! SPB-ISIS:
+! SVCMGR:
+! LDP:
+! EVB:
+! APP-FINGERPRINT:
+app-fingerprint port 2/1/13 monitor-app-group chatting
+app-fingerprint linkagg 111 monitor-app-group network
+
+! FCOE:
+! QMR: 
+! OPENFLOW:
+! Dynamic auto-fabric:
+! SIP Snooping:
+! DHCP Server:
+! DHCPv6 Relay:
+! DHCPv6 Server:
+! DHCP Message Service:
+! DHCP Active Lease Service:
+! Virtual Chassis Split Protection:
+! DHCP Snooping:
+! APP-MONITORING:
+! Loopback Detection:
+! VM-SNOOPING:
+! PPPOE-IA:
+! Security:
+! Zero Configuration:
+zeroconf mdns admin-state enable
+
+! MAC Security:
+! OVC:

@@ -1,0 +1,18 @@
+{
+    "": {
+        "neighbors": {},
+        "local_as": 0,
+        "remove_private_as": false,
+        "remote_as": 0,
+        "prefix_limit": {},
+        "description": "",
+        "export_policy": "",
+        "multihop_ttl": 0,
+        "multipath": false,
+        "apply_groups": [],
+        "type": "",
+        "local_address": "",
+        "import_policy": ""
+    }
+}
+

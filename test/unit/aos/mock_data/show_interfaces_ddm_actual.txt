@@ -1,0 +1,13 @@
+ Chas/
+ Slot/Port   Temp (C)   Voltage (V)   Tx Bias (mA)   Output (dBm)   Input (dBm)  
+----------+----------+------------+--------------+--------------+-------------
+ 1/1/7         37.0        3.299        0.000         -1.2          -31.549    
+ 1/1/11        37.0        3.289        6.654         -2.254        -26.576    
+ 1/1/14        41.0        3.301        4.110         -4.651        -30.458    
+
+
+WL - Exceeds warning low limit
+WH - Exceeds warning high limit
+AL - Exceeds alarm low limit
+AH - Exceeds alarm high limit
+NS - Not Supported

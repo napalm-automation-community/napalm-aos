@@ -1,0 +1,15 @@
+{
+    "os_version": " 8.5.152.R01 Development, March 27, 2018.",
+    "fqdn": "",
+    "uptime": 0,
+    "serial_number": "P468057P",
+    "hostname": "0S6860",
+    "vendor": "Alcatel-Lucent Enterprise ",
+    "model": "OS6860E-24",
+    "interface_list": [
+        "EMP-CMMA-CHAS1",
+        "EMP-CMMA-CHAS2",
+        "Loopback",
+        "vlan1002"
+    ]
+}

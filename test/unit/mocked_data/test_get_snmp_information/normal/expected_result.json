@@ -1,0 +1,12 @@
+{
+    "contact": "unknown",
+    "community": {
+        "public": {
+            "acl": "public",
+            "mode": "unknown"
+        }
+    },
+    "location": "unknown",
+    "chassis_id": "unknown"
+}
+

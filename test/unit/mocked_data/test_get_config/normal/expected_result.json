@@ -1,0 +1,1 @@
+{ "running": "! Chassis:\nsystem name \"0S6860\"\n", "candidate": " ! Configuration:\n- configuration error-file-limit 2", "startup": "! Chassis:\nsystem name \"0S6860\"\n\n! Configuration:\nconfiguration error-file-limit 2\n" }

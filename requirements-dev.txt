@@ -1,0 +1,9 @@
+future
+coveralls
+pytest
+pytest-cov
+pytest-json
+pytest-pythonpath
+pylama
+mock
+-r requirements.txt

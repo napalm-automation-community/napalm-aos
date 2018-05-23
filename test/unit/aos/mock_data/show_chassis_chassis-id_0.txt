@@ -1,0 +1,13 @@
+Local Chassis ID 2 (Slave)
+  Model Name:                    OS6860-24,
+  Module Type:                   0x6062201,
+  Description:                   Chassis,
+  Part Number:                   903713-90,
+  Hardware Revision:             06,
+  Serial Number:                 P418266P,
+  Manufacture Date:              Oct 11 2013,
+  Admin Status:                  POWER ON,
+  Operational Status:            UP,
+  Number Of Resets:              1754,
+  MAC Address:                   e8:e7:32:a4:ab:4f
+

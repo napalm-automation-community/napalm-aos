@@ -1,0 +1,6 @@
+ Virtual Routers     Profile Protocols
+--------------------+-------+-------------------
+default              default OSPF BGP VRRP
+
+Total Number of Virtual Routers: 1
+

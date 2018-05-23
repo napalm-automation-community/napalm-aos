@@ -1,0 +1,33 @@
+{
+    "test": {
+        "sshkeys": [],
+        "level": 0,
+        "password": ""
+    },
+    "public": {
+        "sshkeys": [],
+        "level": 0,
+        "password": ""
+    },
+    "abc": {
+        "sshkeys": [],
+        "level": 0,
+        "password": ""
+    },
+    "test2": {
+        "sshkeys": [],
+        "level": 0,
+        "password": ""
+    },
+    "default (*)": {
+        "sshkeys": [],
+        "level": 0,
+        "password": ""
+    },
+    "admin": {
+        "sshkeys": [],
+        "level": 0,
+        "password": ""
+    }
+}
+

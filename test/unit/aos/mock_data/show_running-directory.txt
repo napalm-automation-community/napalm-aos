@@ -1,0 +1,9 @@
+
+CONFIGURATION STATUS
+  Running CMM              : MASTER-PRIMARY,
+  CMM Mode                 : VIRTUAL-CHASSIS MONO CMM,
+  Current CMM Slot         : CHASSIS-1 A,
+  Running configuration    : WORKING,
+  Certify/Restore Status   : CERTIFY NEEDED
+SYNCHRONIZATION STATUS
+  Running Configuration    : NOT SYNCHRONIZED

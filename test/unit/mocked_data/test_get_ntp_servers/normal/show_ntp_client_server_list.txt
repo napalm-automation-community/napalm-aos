@@ -1,0 +1,6 @@
+Legends: + active peer, - passive peer, = client, * current system peer,
+         ^ broadcast server, ' broadcast client
+Mode IP Address        Ver   Key    St     Delay        Offset         Disp
+----+-----------------+---+-------+----+----------+-----------------+----------
+*    192.168.70.251    4       0    3      0.001            -0.103      0.063
+

@@ -1,0 +1,32 @@
+{
+    "1/1/27": {
+        "physical_channels": {
+            "channel": [
+                {
+                    "state": {
+                        "input_power": {
+                            "max": 0.0,
+                            "min": 0.0,
+                            "avg": 0.0,
+                            "instant": -26.383
+                        },
+                        "laser_bias_current": {
+                            "max": 0.0,
+                            "min": 0.0,
+                            "avg": 0.0,
+                            "instant": 7.186
+                        },
+                        "output_power": {
+                            "max": 0.0,
+                            "min": 0.0,
+                            "avg": 0.0,
+                            "instant": -5.219
+                        }
+                    },
+                    "index": 0
+                }
+            ]
+        }
+    }
+}
+

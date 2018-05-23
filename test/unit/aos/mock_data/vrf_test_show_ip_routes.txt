@@ -1,0 +1,7 @@
+
+ + = Equal cost multipath routes
+ Total 1 routes
+
+  Dest Address       Gateway Addr        Age        Protocol 
+------------------+-------------------+----------+-----------
+  127.0.0.1/32         127.0.0.1         00:00:32   LOCAL     

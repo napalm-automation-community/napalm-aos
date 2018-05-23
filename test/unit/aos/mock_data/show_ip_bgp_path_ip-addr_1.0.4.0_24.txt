@@ -1,0 +1,39 @@
+BGP Path parameters
+Path address   = 10.0.1.0
+Path mask      = 255.255.255.0
+Path protocol  = network
+Path neighbor  = <none>
+  Path nextHop            = 10.0.1.2,
+  Path origin             = igp,
+  Path local preference   = 100,
+  Path state              = active,
+  Path weight             = 32768,
+  Path preference degree  = 100,
+  Path autonomous systems = [nAs=0] : <none> ,
+  Path MED                = <none>,
+  Path atomic             = no,
+  Path AS aggregator      = <none>,
+  Path IPaddr aggregator  = <none>,
+  Path community          = <none>,
+  Path Originator Id      = <none>,
+  Path Cluster List       = <none>,
+  Path unknown attribute  = <none>
+Path address   = 10.0.1.0
+Path mask      = 255.255.255.0
+Path protocol  = ibgp
+Path neighbor  = peer(10.0.1.1)
+  Path nextHop            = 10.0.1.1,
+  Path origin             = igp,
+  Path local preference   = 100,
+  Path state              = inactive,
+  Path weight             = 0,
+  Path preference degree  = 100,
+  Path autonomous systems = [nAs=0] : <none> ,
+  Path MED                = <none>,
+  Path atomic             = no,
+  Path AS aggregator      = <none>,
+  Path IPaddr aggregator  = <none>,
+  Path community          = <none>,
+  Path Originator Id      = <none>,
+  Path Cluster List       = <none>,
+  Path unknown attribute  = <none>

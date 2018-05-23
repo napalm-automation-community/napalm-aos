@@ -1,0 +1,6 @@
+ Virtual Routers     Profile Protocols
+--------------------+-------+-------------------
+default              default BGP VRRP
+test                 max     VRRP
+
+Total Number of Virtual Routers: 2

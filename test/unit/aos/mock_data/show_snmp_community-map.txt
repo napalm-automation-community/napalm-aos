@@ -1,0 +1,6 @@
+Community mode : enabled
+
+status        community string                 user name
+--------+--------------------------------+--------------------------------
+enabled  omnivista                        omnivista
+enabled  ovtest                           

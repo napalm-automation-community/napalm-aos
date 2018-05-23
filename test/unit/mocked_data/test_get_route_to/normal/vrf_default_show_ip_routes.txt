@@ -1,0 +1,6 @@
+
+ + = Equal cost multipath routes
+ Total 2 routes
+
+  Dest Address       Gateway Addr        Age        Protocol 
+------------------+-------------------+----------+----------- 

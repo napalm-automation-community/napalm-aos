@@ -1,0 +1,32 @@
+ Virtual Routers     Profile Protocols
+--------------------+-------+-------------------
+default              default OSPF BGP VRRP
+
+Total Number of Virtual Routers: 1
+
+-> vrf default show ip bgp
+Admin Status                         = disabled,
+Operational Status                   = down,
+Autonomous System Number             = 1,
+BGP Router Id                        = 0.0.0.0,
+Confederation Identifier             = 0,
+IGP Synchronization Status           = disabled,
+Minimum AS Origin Interval (seconds) = 15,
+Default Local Preference             = 100,
+Route Reflection                     = disabled,
+Cluster Id                           = 0.0.0.0,
+Missing MED Status                   = Best,
+Aspath Comparison                    = enabled,
+Always Compare MED                   = disabled,
+Fast External FailOver               = disabled,
+
+g Neighbor Changes                 = disabled,
+Multiple Paths                       = disabled,
+Graceful Restart                     = enabled,
+Graceful Restart Status              = Not Restarting,
+Configured Graceful Restart Interval = 90s,
+IPv4 Unicast                         = enabled,
+IPv6 Unicast                         = disabled,
+BFD Status                           = disabled,
+ASN Output Format                    = asplain
+

@@ -1,0 +1,16 @@
+[
+    {
+        "hostpoll": 16,
+        "offset": -0.067,
+        "synchronized": true,
+        "jitter": 0.0,
+        "delay": 0.001,
+        "remote": "192.168.70.251",
+        "stratum": 3,
+        "referenceid": "113.161.84.122",
+        "when": "37897",
+        "type": "",
+        "reachability": 255
+    }
+]
+

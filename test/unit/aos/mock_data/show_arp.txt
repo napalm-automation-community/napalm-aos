@@ -1,0 +1,8 @@
+
+Total 1 arp entries
+ Flags (P=Proxy, A=Authentication, V=VRRP, B=BFD, H=HAVLAN, I=INTF)
+
+ IP Addr           Hardware Addr       Type       Flags   Port              Interface   Name
+-----------------+-------------------+----------+-------+-----------------+-----------+---------------------------------
+ 10.255.75.1       00:d0:95:e2:80:de   DYNAMIC                         EMP  EMP-VC                                      
+

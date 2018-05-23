@@ -1,0 +1,17 @@
+{
+    "default": {
+        "state": {
+            "route_distinguisher": "None"
+        },
+        "type": "default",
+        "interfaces": {
+            "interface": {
+                "test2": {},
+                "vlan1": {},
+                "Loopback": {},
+                "EMP-CMMA-CHAS1": {}
+            }
+        },
+        "name": "default"
+    }
+}

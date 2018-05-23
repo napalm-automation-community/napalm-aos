@@ -1,0 +1,15 @@
+Legend: + indicates routes in-use
+        b indicates BFD-enabled static route
+        i indicates interface static route
+        r indicates recursive static route, with following address in brackets
+
+
+  Destination         Gateway                   Interface              Protocol  Metric     Tag      Misc-Info
+---------------------+---------------+--------------------------------+--------+-------+----------+-----------------
++  1.0.4.0/24         1.0.4.2         v21                              LOCAL          1          0  
+
+
+Inactive Static Routes
+   Destination       Gateway           Metric        Tag   Misc-Info
+--------------------+-----------------+------+----------+-----------------
+  1.0.0.0/24         1.0.0.1                1          0  

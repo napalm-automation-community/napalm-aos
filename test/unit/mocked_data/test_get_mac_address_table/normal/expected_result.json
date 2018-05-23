@@ -1,0 +1,12 @@
+[
+    {
+        "mac": "e8:e7:32:a2:ab:1c",
+        "interface": "2/1/24",
+        "active": true,
+        "last_move": -1.0,
+        "static": false,
+        "vlan": 1,
+        "moves": -1
+    }
+]
+

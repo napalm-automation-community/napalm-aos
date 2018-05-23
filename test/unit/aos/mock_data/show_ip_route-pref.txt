@@ -1,0 +1,11 @@
+  Protocol    Route Preference Value
+------------+------------------------
+  Local                 1
+  Static                2
+  OSPF                110
+  ISISL1              115
+  ISISL2              118
+  RIP                 120
+  EBGP                190
+  IBGP                200
+  Import              210

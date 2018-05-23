@@ -1,0 +1,44 @@
+{
+    "loopback": {
+        "ipv6": {
+            "::1": {
+                "prefix_length": 128
+            }
+        }
+    },
+    "tunnel_6to4": {
+        "ipv6": {
+            "": {
+                "prefix_length": -1
+            }
+        }
+    },
+    "EMP-CMMA-CHAS1": {
+        "ipv6": {
+            "fe80::eae7:32ff:feab:1f32": {
+                "prefix_length": 64
+            }
+        }
+    },
+    "EMP-CMMA-CHAS2": {
+        "ipv4": {
+            "0.0.0.0": {
+                "prefix_length": 0
+            }
+        }
+    },
+    "vlan1002": {
+        "ipv4": {
+            "10.1.2.93": {
+                "prefix_length": 24
+            }
+        }
+    },
+    "Loopback": {
+        "ipv4": {
+            "127.0.0.1": {
+                "prefix_length": 32
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+Chassis/Tray | Fan | Functional
+-------------+-----+------------
+
+This product has no fans.
+
