@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 
 __author__ = 'Alcatel Lucent Enterprise <ebg_global_supportcenter@al-enterprise.com>'
 
+
 with open("requirements.txt", "r") as fs:
     reqs = [r for r in fs.read().splitlines() if (len(r) > 0 and not r.startswith("#"))]
 

@@ -21,19 +21,32 @@ import tempfile
 import copy
 import os
 
-import napalm_base.helpers
-import napalm_base.constants as C
+import napalm.base.helpers
+import napalm.base.constants as C
 
-from netaddr import IPAddress
-from napalm_aos.utils.AlcatelOS import *
-from napalm_aos.utils.utils import *
-from napalm_base.base import NetworkDriver
-from napalm_base.utils import py23_compat
-from napalm_base.exceptions import (
-    ConnectionException,
-    MergeConfigException,
-    ReplaceConfigException,
-    CommandErrorException,
+try:
+    from netaddr import IPAddress
+    from napalm_aos.utils.AlcatelOS import *
+    from napalm_aos.utils.utils import *
+    from napalm.base import NetworkDriver
+    from napalm.base.utils import py23_compat
+    from napalm.base.exceptions import (
+        ConnectionException,
+        MergeConfigException,
+        ReplaceConfigException,
+        CommandErrorException,
+    )
+except ImportError:
+    from netaddr import IPAddress
+    from napalm_aos.utils.AlcatelOS import *
+    from napalm_aos.utils.utils import *
+    from napalm.base import NetworkDriver
+    from napalm.base.utils import py23_compat
+    from napalm.base.exceptions import (
+        ConnectionException,
+        MergeConfigException,
+        ReplaceConfigException,
+        CommandErrorException,
     )
 
 
@@ -322,7 +335,7 @@ class AOSDriver(NetworkDriver):
             interface = arp_tbl.get_column_by_name("Interface")[index]
             entry = {
                 'interface': interface,
-                'mac': napalm_base.helpers.mac(mac),
+                'mac': napalm.base.helpers.mac(mac),
                 'ip': ipaddr,
                 'age': float(0)
             }
