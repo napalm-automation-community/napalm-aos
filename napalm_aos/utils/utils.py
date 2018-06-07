@@ -10,10 +10,10 @@ import inspect
 def to_seconds(time_format):
     seconds = minutes = hours = days = weeks = 0
 
-    days_match = re.match("(\d+)( days|d)", time_format)
-    hours_match = re.match('(\d+)( hours|h)', time_format)
-    minutes_match = re.match('(\d+)( minutes|m)', time_format)
-    seconds_match = re.match('(\d+)( seconds|s)', time_format)
+    days_match = re.match(r"(\d+)( days|d)", time_format)
+    hours_match = re.match(r'(\d+)( hours|h)', time_format)
+    minutes_match = re.match(r'(\d+)( minutes|m)', time_format)
+    seconds_match = re.match(r'(\d+)( seconds|s)', time_format)
 
     if days_match:
         days = int(days_match.groups()[0])
@@ -25,7 +25,7 @@ def to_seconds(time_format):
         seconds = int(seconds_match.groups()[0])
 
     if (minutes + hours + seconds + days + weeks) == 0:
-        hms_match = re.match('.*(\d+):(\d+):(\d+)', time_format)
+        hms_match = re.match(r'.*(\d+):(\d+):(\d+)', time_format)
         if hms_match:
             hours = int(hms_match.groups()[0])
             minutes = int(hms_match.groups()[1])
@@ -178,7 +178,7 @@ def parse_block(string, indent=' ', delimiter=':', reverse_delimiter=False):
 
 def jprint(stdin):
     import json
-    print (json.dumps(stdin, indent=4))
+    print(json.dumps(stdin, indent=4))
 
 
 def compare_configure(conf1, conf2, mod='+-'):
@@ -222,7 +222,7 @@ def str_filter(astr):
 # Try to convert string to specific type of decimal numbers
 def get_dec_num(astr, ttype):
     try:
-        f_list = re.findall(".*?([-+]?[0-9]+\.?[0-9]*)", astr)
+        f_list = re.findall(r".*?([-+]?[0-9]+\.?[0-9]*)", astr)
         return ttype(f_list[0]) if f_list else astr
     except ValueError:
         return astr
