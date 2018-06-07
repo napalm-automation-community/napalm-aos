@@ -21,10 +21,8 @@ import tempfile
 import copy
 import os
 
-import napalm.base.helpers
-import napalm.base.constants as C
-
 try:
+    import napalm.base.constants as C
     from netaddr import IPAddress
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
@@ -36,18 +34,21 @@ try:
         ReplaceConfigException,
         CommandErrorException,
     )
+    from napalm.base.helpers import mac as standardize_mac
 except ImportError:
+    import napalm_base.constants as C
     from netaddr import IPAddress
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
-    from napalm.base import NetworkDriver
-    from napalm.base.utils import py23_compat
-    from napalm.base.exceptions import (
+    from napalm_base import NetworkDriver
+    from napalm_base.utils import py23_compat
+    from napalm_base.exceptions import (
         ConnectionException,
         MergeConfigException,
         ReplaceConfigException,
         CommandErrorException,
     )
+    from napalm_base.helpers import mac as standardize_mac
 
 
 # STD REGEX PATTERNS
@@ -121,11 +122,11 @@ class AOSDriver(NetworkDriver):
         running_dir = 'certified'
         command = 'show running-directory'
         output = self.device.send_command(command)
-        running_dir_arr = re.findall('.*?Running configuration\s*?:(.+), ', output)
+        running_dir_arr = re.findall(r'.*?Running configuration\s*?:(.+), ', output)
         if running_dir_arr:
             running_dir = running_dir_arr[0].strip().lower()
 
-        running_mode_arr = re.findall('.*?CMM Mode\s*?:(.+), ', output)
+        running_mode_arr = re.findall(r'.*?CMM Mode\s*?:(.+), ', output)
         if running_mode_arr and 'VIRTUAL-CHASSIS' in running_mode_arr[0].strip():
             boot_file = 'vcboot.cfg'
 
@@ -335,7 +336,7 @@ class AOSDriver(NetworkDriver):
             interface = arp_tbl.get_column_by_name("Interface")[index]
             entry = {
                 'interface': interface,
-                'mac': napalm.base.helpers.mac(mac),
+                'mac': standardize_mac(mac),
                 'ip': ipaddr,
                 'age': float(0)
             }
@@ -452,7 +453,7 @@ class AOSDriver(NetworkDriver):
             if cid != -1:
                 speed_str = iface_capability_table.get_column_by_name('Speed')[cid]
                 max_speed = speed_str.split('/')[-1]
-                speed_match = re.match("(\d*)([A-Z]*)", max_speed)
+                speed_match = re.match(r"(\d*)([A-Z]*)", max_speed)
                 speed = speed_match.groups()[0]
                 speed = int(speed)
                 speedformat = speed_match.groups()[1]
@@ -1162,12 +1163,12 @@ class AOSDriver(NetworkDriver):
                 as_path = bgp_path['Path neighbor']['Path autonomous systems']
                 preference2 = bgp_path['Path neighbor']['Path weight']
 
-            route_dict['next_hop'] = re.sub("[\s,]", '', nextHop)
+            route_dict['next_hop'] = re.sub(r"[\s,]", '', nextHop)
 
-            route_dict['protocol_attributes']['as_path'] = re.sub("[\s,]", '', as_path)
-            route_dict['protocol_attributes']['local_preference'] = re.sub("[\s,]", '', local_preference)
-            route_dict['protocol_attributes']['preference2'] = int(re.sub("[\s,]", '', preference2))
-            route_dict['protocol_attributes']['communities'].append(re.sub("[\s,]", '', communities))
+            route_dict['protocol_attributes']['as_path'] = re.sub(r"[\s,]", '', as_path)
+            route_dict['protocol_attributes']['local_preference'] = re.sub(r"[\s,]", '', local_preference)
+            route_dict['protocol_attributes']['preference2'] = int(re.sub(r"[\s,]", '', preference2))
+            route_dict['protocol_attributes']['communities'].append(re.sub(r"[\s,]", '', communities))
 
         route_dict = {
             'current_active': False,

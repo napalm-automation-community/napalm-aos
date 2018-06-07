@@ -1,7 +1,6 @@
 import paramiko
 import re
 import scp
-
 import logging
 
 try:
@@ -11,12 +10,11 @@ try:
         CommandErrorException,
     )
 except ImportError:
-    from napalm.base.utils import py23_compat
-    from napalm.base.exceptions import (
+    from napalm_base.utils import py23_compat
+    from napalm_base.exceptions import (
         ConnectionException,
         CommandErrorException,
     )
-
 
 
 class AlcatelOSSCPConn(object):

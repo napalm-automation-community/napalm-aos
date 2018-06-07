@@ -20,8 +20,8 @@ import mock
 import re
 
 from napalm_aos import aos
-from napalm_base.test.base import TestGettersNetworkDriver
-from napalm_base.utils import py23_compat
+from napalm.base.test.base import TestGettersNetworkDriver
+from napalm.base.utils import py23_compat
 
 
 class TestGetterAOSDriver(unittest.TestCase, TestGettersNetworkDriver):
