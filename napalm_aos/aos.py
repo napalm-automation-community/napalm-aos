@@ -122,7 +122,7 @@ class AOSDriver(NetworkDriver):
         running_dir = 'certified'
         command = 'show running-directory'
         output = self.device.send_command(command)
-        running_dir_arr = re.findall(r'.*?Running configuration\s*?:(.+), ', output)
+        running_dir_arr = re.findall(r'.*?Running configuration\s*?:(.+),\s*', output)
         if running_dir_arr:
             running_dir = running_dir_arr[0].strip().lower()
 
