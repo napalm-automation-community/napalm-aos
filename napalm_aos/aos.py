@@ -124,9 +124,11 @@ class AOSDriver(NetworkDriver):
         output = self.device.send_command(command)
         running_dir_arr = re.findall(r'.*?Running configuration\s*?:(.+),\s*', output)
         if running_dir_arr:
-            running_dir = running_dir_arr[0].strip().lower()
+            running_dir = running_dir_arr[0].strip()
+            if running_dir == "WORKING" or running_dir == "CERTIFIED":
+                running_dir = running_dir.lower()
 
-        running_mode_arr = re.findall(r'.*?CMM Mode\s*?:(.+), ', output)
+        running_mode_arr = re.findall(r'.*?CMM Mode\s*?:(.+),\s*', output)
         if running_mode_arr and 'VIRTUAL-CHASSIS' in running_mode_arr[0].strip():
             boot_file = 'vcboot.cfg'
 
