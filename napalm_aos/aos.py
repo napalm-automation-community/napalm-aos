@@ -223,8 +223,13 @@ class AOSDriver(NetworkDriver):
             except socket.timeout:
                 pass
         else:
+            removeCmd = "rm -rf /flash/{}.*".format(self.candidate_cfg_file)
+            error = self.device.send_command(removeCmd)
             self.device.send_command('configuration apply {}/{}'.format(self.dest_file_system,
                                                                         self.candidate_cfg_file))
+            listCmd = "ls /flash/{}.* | wc -l".format(self.candidate_cfg_file)
+            if self.device.send_command(listCmd) == '1':
+                raise CommandErrorException("Error: invalid command")
 
     def discard_config(self):
         command = 'rm -rf {}/{}'.format(self.dest_file_system, self.candidate_cfg_file)
