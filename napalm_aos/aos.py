@@ -208,10 +208,9 @@ class AOSDriver(NetworkDriver):
             diff = compare_configure(running_cfg, output)
         else:
             diff = compare_configure(running_cfg, output, '+')
-        return '\nasdfdsf'.join(diff)
+        return '\n'.join(diff)
 
     def commit_config(self):
-        return "\nsdadasd"
         if self.config_replace:
             boot_dir, boot_file = self._get_boot_config_location()
             self.device.send_command('cp -rf {}/{} {}/{}'.format(self.dest_file_system,
