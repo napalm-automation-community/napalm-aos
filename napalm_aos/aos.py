@@ -164,6 +164,7 @@ class AOSDriver(NetworkDriver):
         if filename and os.path.exists(filename) is True:
             command = 'mkdir -p {}'.format(self.dest_file_system)
             self.device.send_command(command)
+            format_white_space_for_file(filename)
             self._scp_client.scp_transfer_file(filename, "{}/{}".format(self.dest_file_system,
                                                                         self.candidate_cfg_file))
             self.config_replace = True
@@ -187,7 +188,7 @@ class AOSDriver(NetworkDriver):
         else:
             raise MergeConfigException("No configuration found")
 
-        temp_file = self._create_tmp_file(new_config, self.candidate_cfg_file)
+        temp_file = self._create_tmp_file(format_white_space(new_config), self.candidate_cfg_file)
         self._scp_client.scp_transfer_file(temp_file, self.dest_file_system)
         self.candidate_cfg_file = path_leaf(temp_file)
         os.remove(temp_file)
@@ -205,9 +206,9 @@ class AOSDriver(NetworkDriver):
         if exitcode != 0:
             raise CommandErrorException("No candidate configuration found")
         if self.config_replace:
-            diff = compare_configure(running_cfg, output)
+            diff = compare_configure(running_cfg, format_white_space(output))
         else:
-            diff = compare_configure(running_cfg, output, '+')
+            diff = compare_configure(running_cfg, format_white_space(output), '+')
         return '\n'.join(diff)
 
     def commit_config(self):
@@ -1077,13 +1078,13 @@ class AOSDriver(NetworkDriver):
     def _get_config_snapshot(self):
         command = 'show configuration snapshot'
         running_cfg = self.device.send_command(command)
-        return running_cfg
+        return format_white_space(running_cfg)
 
     def _get_startup_config(self):
         running_dir, boot_file = self._get_boot_config_location()
         command = 'cat {}/{}'.format(running_dir, boot_file)
         startup_cfg = self.device.send_command(command)
-        return startup_cfg
+        return format_white_space(startup_cfg)
 
     def get_route_to(self, destination='', protocol=''):
         """Implementation of NAPALM method get_route_to.

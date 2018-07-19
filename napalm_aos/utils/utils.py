@@ -5,6 +5,7 @@ import socket
 import struct
 import logging
 import inspect
+import os
 
 
 def to_seconds(time_format):
@@ -43,6 +44,22 @@ def cidr_to_netmask(cidr):
     host_bits = 32 - int(net_bits)
     netmask = socket.inet_ntoa(struct.pack('!I', (1 << 32) - (1 << host_bits)))
     return network, netmask
+
+
+def format_white_space(string):
+    temp = re.sub(' +', ' ', string)
+    temp = re.sub('\n ', '\n', temp)
+    temp = re.sub(' \n', '\n', temp)
+    return temp.strip()
+
+
+def format_white_space_for_file(filename):
+    new_config = ''
+    if filename and os.path.exists(filename) is True:
+        with open(filename) as f:
+            new_config = f.read()
+        with open(filename, 'w') as f:
+            f.write(format_white_space(new_config))
 
 
 class AOSTable:
