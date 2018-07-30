@@ -218,6 +218,8 @@ class AOSDriver(NetworkDriver):
                                                                  self.candidate_cfg_file,
                                                                  boot_dir,
                                                                  boot_file))
+            removecommand = "rm -rf {}".format(self.dest_file_system)
+            self.device.send_command(removecommand)
             try:
                 # Try to reboot switch
                 self.device.send_command_non_blocking('echo Y | reload from {} no roll'.format(boot_dir), timeout=1)
@@ -231,6 +233,8 @@ class AOSDriver(NetworkDriver):
             listCmd = "ls /flash/{}.* | wc -l".format(self.candidate_cfg_file)
             if self.device.send_command(listCmd) == '1':
                 raise CommandErrorException("Error: invalid command")
+            removecommand = "rm -rf {}".format(self.dest_file_system)
+            self.device.send_command(removecommand)
 
     def discard_config(self):
         command = 'rm -rf {}/{}'.format(self.dest_file_system, self.candidate_cfg_file)
