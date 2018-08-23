@@ -213,6 +213,21 @@ class AOSDriver(NetworkDriver):
         return '\n'.join(diff)
 
     def commit_config(self, message=""):
+        if self.config_replace:
+            boot_dir, boot_file = self._get_boot_config_location()
+            self.device.send_command('cp -rf {}/{} {}/{}'.format(
+                self.dest_file_system, self.candidate_remote_cfg_file,
+                boot_dir, boot_file))
+            removecommand = "rm -rf {}".format(self.dest_file_system)
+            self.device.send_command(removecommand)
+            try:
+                # Try to reboot switch
+                self.device.send_command_non_blocking(
+                    'echo Y | reload from {} no roll'.format(boot_dir),
+                    timeout=1)
+            except socket.timeout:
+                pass
+        else:
             removeCmd = "rm -rf /flash/" + self.candidate_remote_cfg_file + ".*.err"
             self.device.send_command(removeCmd)
             self.device.send_command('configuration apply {}/{}'.format(
