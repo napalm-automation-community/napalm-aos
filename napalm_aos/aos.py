@@ -31,7 +31,6 @@ try:
     from napalm.base.exceptions import (
         ConnectionException,
         MergeConfigException,
-        ReplaceConfigException,
         CommandErrorException,
     )
     from napalm.base.helpers import mac as standardize_mac
@@ -45,11 +44,9 @@ except ImportError:
     from napalm_base.exceptions import (
         ConnectionException,
         MergeConfigException,
-        ReplaceConfigException,
         CommandErrorException,
     )
     from napalm_base.helpers import mac as standardize_mac
-
 
 # STD REGEX PATTERNS
 IP_ADDR_REGEX = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
@@ -59,7 +56,8 @@ IPV6_ADDR_REGEX_2 = r"[0-9a-fA-F:]{1,39}::[0-9a-fA-F:]{1,39}"
 IPV6_ADDR_REGEX_3 = r"[0-9a-fA-F]{1,3}:[0-9a-fA-F]{1,3}:[0-9a-fA-F]{1,3}:[0-9a-fA-F]{1,3}:" \
                      "[0-9a-fA-F]{1,3}:[0-9a-fA-F]{1,3}:[0-9a-fA-F]{1,3}:[0-9a-fA-F]{1,3}"
 # Should validate IPv6 address using an IP address library after matching with this regex
-IPV6_ADDR_REGEX = "(?:{}|{}|{})".format(IPV6_ADDR_REGEX_1, IPV6_ADDR_REGEX_2, IPV6_ADDR_REGEX_3)
+IPV6_ADDR_REGEX = "(?:{}|{}|{})".format(IPV6_ADDR_REGEX_1, IPV6_ADDR_REGEX_2,
+                                        IPV6_ADDR_REGEX_3)
 MAC_REGEX = r"[a-fA-F0-9]{4}\.[a-fA-F0-9]{4}\.[a-fA-F0-9]{4}"
 
 INTERFACE_REGEX_1 = r'\d+[a-zA-Z]*\/\d+[a-zA-Z]*\/\d+[a-zA-Z]*'
@@ -83,20 +81,25 @@ logging.basicConfig(level=log_level)
 class AOSDriver(NetworkDriver):
     """NAPALM Alcatel-Lucent AOS Handler."""
 
-    def __init__(self, hostname, username, password, timeout=60, optional_args=None):
+    def __init__(self,
+                 hostname,
+                 username,
+                 password,
+                 timeout=60,
+                 optional_args=None):
         """NAPALM Alcatel-Lucent AOS Handler."""
         if optional_args is None:
             optional_args = {}
 
-        self.dest_file_system = optional_args.get('dest_file_system', '/flash/napalm')
-        self.candidate_cfg_file = optional_args.get('candidate_cfg_file', 'candidate.cfg')
+        self.dest_file_system = optional_args.get('dest_file_system',
+                                                  '/flash/napalm')
+        self.candidate_cfg_file = optional_args.get(
+            'candidate_cfg_file', 'nap_aos-' + str(uuid.uuid4()))
+        self.candidate_remote_cfg_file = 'napalm.cfg'
         self.config_replace = False
         self._scp_client = None
 
-        self.device = AlcatelOS(hostname,
-                                username,
-                                password,
-                                timeout,
+        self.device = AlcatelOS(hostname, username, password, timeout,
                                 optional_args)
 
     def open(self):
@@ -122,13 +125,15 @@ class AOSDriver(NetworkDriver):
         running_dir = 'certified'
         command = 'show running-directory'
         output = self.device.send_command(command)
-        running_dir_arr = re.findall(r'.*?Running configuration\s*?:(.+),\s*', output)
+        running_dir_arr = re.findall(r'.*?Running configuration\s*?:(.+),\s*',
+                                     output)
         if running_dir_arr:
             running_dir = running_dir_arr[0].strip()
             if running_dir == "WORKING" or running_dir == "CERTIFIED":
                 running_dir = running_dir.lower()
         running_mode_arr = re.findall(r'.*?CMM Mode\s*?:(.+),\s*', output)
-        if running_mode_arr and 'VIRTUAL-CHASSIS' in running_mode_arr[0].strip():
+        if running_mode_arr and 'VIRTUAL-CHASSIS' in running_mode_arr[0].strip(
+        ):
             boot_file = 'vcboot.cfg'
 
         return "/flash/" + running_dir, boot_file
@@ -152,30 +157,22 @@ class AOSDriver(NetworkDriver):
     def load_replace_candidate(self, filename=None, config=None):
         """
         SCP file to device filesystem, defaults to boot directory.
-
-        Return None or raise exception
         """
         if config and filename:
             raise ReplaceConfigException("No configuration found")
-
-        if config:
-            filename = self._create_tmp_file(config, self.candidate_cfg_file)
-
-        if filename and os.path.exists(filename) is True:
-            command = 'mkdir -p {}'.format(self.dest_file_system)
-            self.device.send_command(command)
-            format_white_space_for_file(filename)
-            self._scp_client.scp_transfer_file(filename, "{}/{}".format(self.dest_file_system,
-                                                                        self.candidate_cfg_file))
-            self.config_replace = True
-        else:
-            raise ReplaceConfigException("Config file is not found")
+        self._load_candidate(filename, config)
+        self.config_replace = True
 
     def load_merge_candidate(self, filename=None, config=None):
         """
         SCP file to remote device.
+        """
+        self._load_candidate(filename, config)
+        self.config_replace = False
 
-        Merge configuration in: copy <file> running-config
+    def _load_candidate(self, filename=None, config=None):
+        """
+        SCP file to remote device.
         """
         new_config = ''
         command = 'mkdir -p {}'.format(self.dest_file_system)
@@ -188,58 +185,66 @@ class AOSDriver(NetworkDriver):
         else:
             raise MergeConfigException("No configuration found")
 
-        temp_file = self._create_tmp_file(format_white_space(new_config), self.candidate_cfg_file)
-        self._scp_client.scp_transfer_file(temp_file, self.dest_file_system)
+        temp_file = self._create_tmp_file(
+            format_white_space(new_config), self.candidate_cfg_file)
+        self._scp_client.scp_transfer_file(
+            temp_file, "{}/{}".format(self.dest_file_system,
+                                      self.candidate_remote_cfg_file))
         self.candidate_cfg_file = path_leaf(temp_file)
         os.remove(temp_file)
-        self.config_replace = False
 
     def compare_config(self):
         diff = ''
         config_dir = self.dest_file_system
-        config_file = self.candidate_cfg_file
+        config_file = self.candidate_remote_cfg_file
         running_cfg = self._get_config_snapshot()
 
         command = 'echo "`cat {}/{}`"'.format(config_dir, config_file)
-        output, error, exitcode = self.device.send_command_std(command, throw_exception=False)
+        output, error, exitcode = self.device.send_command_std(
+            command, throw_exception=False)
 
         if exitcode != 0:
             raise CommandErrorException("No candidate configuration found")
         if self.config_replace:
             diff = compare_configure(running_cfg, format_white_space(output))
         else:
-            diff = compare_configure(running_cfg, format_white_space(output), '+')
+            diff = compare_configure(running_cfg, format_white_space(output),
+                                     '+')
         return '\n'.join(diff)
 
     def commit_config(self, message=""):
         if self.config_replace:
             boot_dir, boot_file = self._get_boot_config_location()
-            self.device.send_command('cp -rf {}/{} {}/{}'.format(self.dest_file_system,
-                                                                 self.candidate_cfg_file,
-                                                                 boot_dir,
-                                                                 boot_file))
+            self.device.send_command('cp -rf {}/{} {}/{}'.format(
+                self.dest_file_system, self.candidate_remote_cfg_file,
+                boot_dir, boot_file))
             removecommand = "rm -rf {}".format(self.dest_file_system)
             self.device.send_command(removecommand)
             try:
                 # Try to reboot switch
-                self.device.send_command_non_blocking('echo Y | reload from {} no roll'.format(boot_dir), timeout=1)
+                self.device.send_command_non_blocking(
+                    'echo Y | reload from {} no roll'.format(boot_dir),
+                    timeout=1)
             except socket.timeout:
                 pass
         else:
-            removeCmd = "rm -rf /flash/{}.*".format(self.candidate_cfg_file)
-            error = self.device.send_command(removeCmd)
-            self.device.send_command('configuration apply {}/{}'.format(self.dest_file_system,
-                                                                        self.candidate_cfg_file))
-            removecommand = "rm -rf {}".format(self.dest_file_system)
-            self.device.send_command(removecommand)
-            listCmd = "ls /flash/{}.* | wc -l".format(self.candidate_cfg_file)
+            removeCmd = "rm -rf /flash/" + self.candidate_remote_cfg_file + ".*.err"
+            self.device.send_command(removeCmd)
+            self.device.send_command('configuration apply {}/{}'.format(
+                self.dest_file_system, self.candidate_remote_cfg_file))
+            listCmd = "ls /flash/" + self.candidate_remote_cfg_file + ".*.err | wc -l"
+            removeCmd = "rm -rf {}".format(self.dest_file_system)
+            self.device.send_command(removeCmd)
             if self.device.send_command(listCmd) == '1':
-                openFile = "cat /flash/{}.1.err".format(self.candidate_cfg_file)
-                output = self.device.send_command(openFile, throw_exception=False)
+                openFile = "cat /flash/{}.1.err".format(
+                    self.candidate_remote_cfg_file)
+                output = self.device.send_command(
+                    openFile, throw_exception=False)
                 raise CommandErrorException(output)
 
     def discard_config(self):
-        command = 'rm -rf {}/{}'.format(self.dest_file_system, self.candidate_cfg_file)
+        command = 'rm -rf {}/{}'.format(self.dest_file_system,
+                                        self.candidate_remote_cfg_file)
         self.device.send_command(command)
 
     @staticmethod
@@ -259,7 +264,8 @@ class AOSDriver(NetworkDriver):
 
         show_sys = self.device.send_command('show system')
         show_chass = self.device.send_command('show chassis chassis-id 0')
-        show_ip_inf = self.device.send_command("show ip interface | awk '{print $1}'")
+        show_ip_inf = self.device.send_command(
+            "show ip interface | awk '{print $1}'")
 
         # Parse system info
         for line in show_sys.strip().splitlines():
@@ -267,7 +273,7 @@ class AOSDriver(NetworkDriver):
             key = info[0].strip()
             value = info[1].strip()
             if len(value) != 0 and value[len(value) - 1] == ',':
-                value = value[:len(value)-1]
+                value = value[:len(value) - 1]
 
             system_info[key] = value
 
@@ -306,9 +312,7 @@ class AOSDriver(NetworkDriver):
 
     def is_alive(self):
         """Returns a flag with the state of the SSH connection."""
-        return {
-            'is_alive': self.device.is_alive()
-        }
+        return {'is_alive': self.device.is_alive()}
 
     def get_arp_table(self):
         """
@@ -392,17 +396,27 @@ class AOSDriver(NetworkDriver):
         for index, iface in enumerate(iftable.get_column_by_name("Name")):
             ip_address = iftable.get_column_by_name("IP Address")[index]
             val = {
-                'prefix_length': IPAddress(iftable.get_column_by_name("Subnet Mask")[index]).netmask_bits()}
+                'prefix_length':
+                IPAddress(iftable.get_column_by_name("Subnet Mask")[index])
+                .netmask_bits()
+            }
             interfaces[iface] = {"ipv4": {ip_address: val}}
 
         for index, iface in enumerate(ifv6table.get_column_by_name("Name")):
-            ipv6_cidr = ifv6table.get_column_by_name("IPv6 Address/Prefix Length")[index]
+            ipv6_cidr = ifv6table.get_column_by_name(
+                "IPv6 Address/Prefix Length")[index]
             ipv6_addr, prefix_length = (u'', -1)
             if ipv6_cidr != "":
                 ipv6_addr, prefix_length = ipv6_cidr.split(r'/')
                 prefix_length = int(prefix_length)
 
-            interfaces[iface] = {'ipv6': {ipv6_addr: {'prefix_length': prefix_length}}}
+            interfaces[iface] = {
+                'ipv6': {
+                    ipv6_addr: {
+                        'prefix_length': prefix_length
+                    }
+                }
+            }
 
         return interfaces
 
@@ -455,16 +469,22 @@ class AOSDriver(NetworkDriver):
 
         for key in raw_interfaces_dict.keys():
             m_iface = re.findall(INTERFACE_REGEX_1, key)
-            iface = m_iface[0] if m_iface else re.findall(INTERFACE_REGEX_2, key)[0]
-            is_up = (raw_interfaces_dict[key]['Operational Status'].strip().replace(',', '') == 'up')
+            iface = m_iface[0] if m_iface else re.findall(
+                INTERFACE_REGEX_2, key)[0]
+            is_up = (
+                raw_interfaces_dict[key]['Operational Status'].strip().replace(
+                    ',', '') == 'up')
             cid = iface_status_table.get_id_by_value(0, iface)  # Name column
             if cid != -1:
                 # Admin Status column
-                is_enabled = (iface_status_table.get_column_by_index(1)[cid] == 'en')
+                is_enabled = (
+                    iface_status_table.get_column_by_index(1)[cid] == 'en')
 
-            cid = iface_capability_table.get_id_by_value(0, iface)  # Name column
+            cid = iface_capability_table.get_id_by_value(0,
+                                                         iface)  # Name column
             if cid != -1:
-                speed_str = iface_capability_table.get_column_by_name('Speed')[cid]
+                speed_str = iface_capability_table.get_column_by_name('Speed')[
+                    cid]
                 max_speed = speed_str.split('/')[-1]
                 speed_match = re.match(r"(\d*)([A-Z]*)", max_speed)
                 speed = speed_match.groups()[0]
@@ -474,9 +494,14 @@ class AOSDriver(NetworkDriver):
                     speed = (speed * 1000)
             mac_address = raw_interfaces_dict[key]['MAC address']
             mac_address = mac_address.strip().replace(',', '')
-            interfaces[iface] = {'is_enabled': is_enabled, 'is_up': is_up,
-                                 'description': description, 'mac_address': mac_address,
-                                 'last_flapped': last_flapped, 'speed': speed}
+            interfaces[iface] = {
+                'is_enabled': is_enabled,
+                'is_up': is_up,
+                'description': description,
+                'mac_address': mac_address,
+                'last_flapped': last_flapped,
+                'speed': speed
+            }
         return interfaces
 
     def get_interfaces_counters(self):
@@ -506,19 +531,28 @@ class AOSDriver(NetworkDriver):
         for key in raw_interfaces_dict.keys():
             tx_rx = {}
             m_iface = re.findall(INTERFACE_REGEX_1, key)
-            iface = m_iface[0] if m_iface else re.findall(INTERFACE_REGEX_2, key)[0]
-            tx_rx['tx_errors'] = int(raw_interfaces_dict[key]['Error Frames'][1].strip())
-            tx_rx['rx_errors'] = int(raw_interfaces_dict[key]['Error Frames'][0].strip())
+            iface = m_iface[0] if m_iface else re.findall(
+                INTERFACE_REGEX_2, key)[0]
+            tx_rx['tx_errors'] = int(
+                raw_interfaces_dict[key]['Error Frames'][1].strip())
+            tx_rx['rx_errors'] = int(
+                raw_interfaces_dict[key]['Error Frames'][0].strip())
             tx_rx['tx_discards'] = 0  # Not support
             tx_rx['rx_discards'] = 0  # Not support
             tx_rx['tx_octets'] = 0  # Not support
             tx_rx['rx_octets'] = 0  # Not support
-            tx_rx['tx_unicast_packets'] = int(raw_interfaces_dict[key]['Unicast Frames'][1].strip())
-            tx_rx['rx_unicast_packets'] = int(raw_interfaces_dict[key]['Unicast Frames'][0].strip())
-            tx_rx['tx_multicast_packets'] = int(raw_interfaces_dict[key]['M-cast Frames'][1].strip())
-            tx_rx['rx_multicast_packets'] = int(raw_interfaces_dict[key]['M-cast Frames'][0].strip())
-            tx_rx['tx_broadcast_packets'] = int(raw_interfaces_dict[key]['Broadcast Frames'][1].strip())
-            tx_rx['rx_broadcast_packets'] = int(raw_interfaces_dict[key]['Broadcast Frames'][0].strip())
+            tx_rx['tx_unicast_packets'] = int(
+                raw_interfaces_dict[key]['Unicast Frames'][1].strip())
+            tx_rx['rx_unicast_packets'] = int(
+                raw_interfaces_dict[key]['Unicast Frames'][0].strip())
+            tx_rx['tx_multicast_packets'] = int(
+                raw_interfaces_dict[key]['M-cast Frames'][1].strip())
+            tx_rx['rx_multicast_packets'] = int(
+                raw_interfaces_dict[key]['M-cast Frames'][0].strip())
+            tx_rx['tx_broadcast_packets'] = int(
+                raw_interfaces_dict[key]['Broadcast Frames'][1].strip())
+            tx_rx['rx_broadcast_packets'] = int(
+                raw_interfaces_dict[key]['Broadcast Frames'][0].strip())
             counters[iface] = tx_rx
         return counters
 
@@ -539,7 +573,8 @@ class AOSDriver(NetworkDriver):
         output = self.device.send_command(command)
         mac_tbl = AOSTable(output)
 
-        for index, mac_addr in enumerate(mac_tbl.get_column_by_name("Mac Address")):
+        for index, mac_addr in enumerate(
+                mac_tbl.get_column_by_name("Mac Address")):
             moves = -1
             last_move = -1.0
             static = False
@@ -555,7 +590,9 @@ class AOSDriver(NetworkDriver):
 
             interface = mac_tbl.get_column_by_name("Interface")[index]
             try:
-                vlan = int(mac_tbl.get_column_by_name('Vlan/SrvcId[ISId/vnId]')[index])
+                vlan = int(
+                    mac_tbl.get_column_by_name('Vlan/SrvcId[ISId/vnId]')[
+                        index])
             except Exception:
                 vlan = -1
             macs.append({
@@ -581,10 +618,12 @@ class AOSDriver(NetworkDriver):
         lldp_dict = parse_block(output, reverse_delimiter=True)
         for local_port in lldp_dict.keys():
             m_iface = re.findall(INTERFACE_REGEX_1, local_port)
-            iface = m_iface[0] if m_iface else re.findall(INTERFACE_REGEX_2, local_port)[0]
+            iface = m_iface[0] if m_iface else re.findall(
+                INTERFACE_REGEX_2, local_port)[0]
             neighbors = []
             for chassis in lldp_dict[local_port].keys():
-                hostname = lldp_dict[local_port][chassis]['System Name'].strip()
+                hostname = lldp_dict[local_port][chassis][
+                    'System Name'].strip()
                 port_match = re.match(r".*(Port) (\d+)", chassis)
                 port = port_match.groups()[1]
                 entry = {
@@ -609,22 +648,29 @@ class AOSDriver(NetworkDriver):
         lldp_dict = parse_block(output, reverse_delimiter=True)
         for local_port in lldp_dict.keys():
             m_iface = re.findall(INTERFACE_REGEX_1, local_port)
-            iface = m_iface[0] if m_iface else re.findall(INTERFACE_REGEX_2, local_port)[0]
+            iface = m_iface[0] if m_iface else re.findall(
+                INTERFACE_REGEX_2, local_port)[0]
             if not interface or iface == interface:
                 neighbors = []
                 for chassis in lldp_dict[local_port].keys():
                     port = ''
                     remote_chassis_id = ''
-                    hostname = lldp_dict[local_port][chassis]['System Name'].strip()
-                    description = lldp_dict[local_port][chassis]['System Description'].strip()
-                    system_capab = lldp_dict[local_port][chassis]['Capabilities Supported'].strip()
-                    system_enable_capab = lldp_dict[local_port][chassis]['Capabilities Enabled'].strip()
-                    remote_port_description = lldp_dict[local_port][chassis]['Port Description'].strip()
+                    hostname = lldp_dict[local_port][chassis][
+                        'System Name'].strip()
+                    description = lldp_dict[local_port][chassis][
+                        'System Description'].strip()
+                    system_capab = lldp_dict[local_port][chassis][
+                        'Capabilities Supported'].strip()
+                    system_enable_capab = lldp_dict[local_port][chassis][
+                        'Capabilities Enabled'].strip()
+                    remote_port_description = lldp_dict[local_port][chassis][
+                        'Port Description'].strip()
                     port_match = re.match(r".*(Port) (\d+)", chassis)
                     if port_match and len(port_match.groups()) > 1:
                         port = port_match.groups()[1]
 
-                    rmc = re.findall(r"(?:[0-9a-fA-F]:?){12}", chassis)  # Find MAC Address
+                    rmc = re.findall(r"(?:[0-9a-fA-F]:?){12}",
+                                     chassis)  # Find MAC Address
                     if rmc != []:
                         remote_chassis_id = rmc[0]
 
@@ -708,6 +754,7 @@ class AOSDriver(NetworkDriver):
             }
         ]
         """
+
         def extract_second(s_time):
             seconds_regex = r".*?([-+]?[0-9]+\.?[0-9]*) (seconds).*?"
             match = re.match(seconds_regex, s_time)
@@ -730,25 +777,32 @@ class AOSDriver(NetworkDriver):
             offset = extract_second(server['Offset'])
             jitter = extract_second(server['Dispersion'])
             hostpoll = extract_second(server['Minpoll'])
-            synchronized = True if 'synchronization' in server['Status'] else False
+            synchronized = True if 'synchronization' in server[
+                'Status'] else False
             ntp_stats.append({
-                    'remote': server['IP address'].strip(),
-                    'synchronized': synchronized,
-                    'referenceid': server['Reference IP'].strip(),
-                    'stratum': int(server['Stratum']),
-                    'type': u'',
-                    'when': py23_compat.text_type(when),
-                    'hostpoll': int(hostpoll),
-                    'reachability': int(server['Reachability'], 16),
-                    'delay': float(delay),
-                    'offset': float(offset),
-                    'jitter': float(jitter)
-                })
+                'remote': server['IP address'].strip(),
+                'synchronized': synchronized,
+                'referenceid': server['Reference IP'].strip(),
+                'stratum': int(server['Stratum']),
+                'type': u'',
+                'when': py23_compat.text_type(when),
+                'hostpoll': int(hostpoll),
+                'reachability': int(server['Reachability'], 16),
+                'delay': float(delay),
+                'offset': float(offset),
+                'jitter': float(jitter)
+            })
 
         return ntp_stats
 
-    def ping(self, destination, source=C.PING_SOURCE, ttl=C.PING_TTL, timeout=C.PING_TIMEOUT,
-             size=C.PING_SIZE, count=C.PING_COUNT, vrf=C.PING_VRF):
+    def ping(self,
+             destination,
+             source=C.PING_SOURCE,
+             ttl=C.PING_TTL,
+             timeout=C.PING_TIMEOUT,
+             size=C.PING_SIZE,
+             count=C.PING_COUNT,
+             vrf=C.PING_VRF):
         """
         Execute ping on the device and returns a dictionary with the result.
 
@@ -779,7 +833,8 @@ class AOSDriver(NetworkDriver):
         if source:
             command += ' source-interface {}'.format(source)
 
-        output, error, retCode = self.device.send_command_std(command, throw_exception=False)
+        output, error, retCode = self.device.send_command_std(
+            command, throw_exception=False)
 
         if retCode != 0:
             ping_dict['error'] = error
@@ -790,13 +845,13 @@ class AOSDriver(NetworkDriver):
             return ping_dict
 
         ping_dict['success'] = {
-                'probes_sent': 0,
-                'packet_loss': 0,
-                'rtt_min': 0.0,
-                'rtt_max': 0.0,
-                'rtt_avg': 0.0,
-                'rtt_stddev': 0.0,
-                'results': []
+            'probes_sent': 0,
+            'packet_loss': 0,
+            'rtt_min': 0.0,
+            'rtt_max': 0.0,
+            'rtt_avg': 0.0,
+            'rtt_stddev': 0.0,
+            'results': []
         }
 
         results_array = []
@@ -806,30 +861,38 @@ class AOSDriver(NetworkDriver):
             if 'icmp' in line:
                 ip_addr = re.findall(IPV4_ADDR_REGEX, line)
                 mtime = re.match(r'.*?(time ?= ?)(\d+.?\d*)', line)
-                rrt = mtime.groups()[1] if mtime and len(mtime.groups()[1]) > 1 else 0.0
-                results_array.append(
-                    {
-                        'ip_address': ip_addr[0],
-                        'rtt': float(rrt),
-                    }
-                )
+                rrt = mtime.groups()[1] if mtime and len(
+                    mtime.groups()[1]) > 1 else 0.0
+                results_array.append({
+                    'ip_address': ip_addr[0],
+                    'rtt': float(rrt),
+                })
             elif 'packets transmitted' in line:
-                pkg_match = re.match(r'.*?([0-9]+) (packets transmitted).*?', line)
-                probes_sent = int(pkg_match.groups()[0]) if pkg_match and len(pkg_match.groups()) > 1 else 0
+                pkg_match = re.match(r'.*?([0-9]+) (packets transmitted).*?',
+                                     line)
+                probes_sent = int(pkg_match.groups()[0]) if pkg_match and len(
+                    pkg_match.groups()) > 1 else 0
                 pkg_match = re.match(r'.*?([0-9]+) (received).*?', line)
-                received = int(pkg_match.groups()[0]) if pkg_match and len(pkg_match.groups()) > 1 else 0
+                received = int(pkg_match.groups()[0]) if pkg_match and len(
+                    pkg_match.groups()) > 1 else 0
                 # loss = re.match(r'.*?([0-9]+)%? (packet loss).*?', ping_data[indices[0]+1])
 
                 ping_dict['success']['probes_sent'] = int(probes_sent)
-                ping_dict['success']['packet_loss'] = int(probes_sent - received)
+                ping_dict['success']['packet_loss'] = int(probes_sent -
+                                                          received)
             elif 'min/avg/max/mdev' in line:
-                rrt_match = re.match(r'.*?(\d+.?\d*)/(\d+.?\d*)/(\d+.?\d*)/(\d+.?\d*).*?', line)
+                rrt_match = re.match(
+                    r'.*?(\d+.?\d*)/(\d+.?\d*)/(\d+.?\d*)/(\d+.?\d*).*?', line)
                 if rrt_match and len(rrt_match.groups()) > 3:
                     ping_dict['success'].update({
-                                'rtt_min': float(rrt_match.groups()[0]),
-                                'rtt_avg': float(rrt_match.groups()[1]),
-                                'rtt_max': float(rrt_match.groups()[2]),
-                                'rtt_stddev': float(rrt_match.groups()[3]),
+                        'rtt_min':
+                        float(rrt_match.groups()[0]),
+                        'rtt_avg':
+                        float(rrt_match.groups()[1]),
+                        'rtt_max':
+                        float(rrt_match.groups()[2]),
+                        'rtt_stddev':
+                        float(rrt_match.groups()[3]),
                     })
         ping_dict['success'].update({'results': results_array})
         return ping_dict
@@ -845,30 +908,37 @@ class AOSDriver(NetworkDriver):
 
         vrf_tbl = AOSTable(output)
 
-        for index, vrf_name in enumerate(vrf_tbl.get_column_by_name("Virtual Routers")):
+        for index, vrf_name in enumerate(
+                vrf_tbl.get_column_by_name("Virtual Routers")):
             if name == '' or name == vrf_name:
-                vrf = {'name': vrf_name,
-                       'type': vrf_tbl.get_column_by_name("Profile")[index],
-                       'state': {
-                                    'route_distinguisher': u'None'
-                                },
-                       'interfaces': {
-                                        'interface': {}
-                                     }
-                       }
+                vrf = {
+                    'name': vrf_name,
+                    'type': vrf_tbl.get_column_by_name("Profile")[index],
+                    'state': {
+                        'route_distinguisher': u'None'
+                    },
+                    'interfaces': {
+                        'interface': {}
+                    }
+                }
 
                 command = 'vrf {} show ip interface'.format(vrf_name)
                 if_output = self.device.send_command(command)
                 ip_inf_tbl = AOSTable(if_output)
-                for index, iface_name in enumerate(ip_inf_tbl.get_column_by_index(0)):
+                for index, iface_name in enumerate(
+                        ip_inf_tbl.get_column_by_index(0)):
                     vrf['interfaces']['interface'][iface_name] = {}
 
                 vrfs[vrf_name] = vrf
 
         return vrfs
 
-    def traceroute(self, destination, source=C.TRACEROUTE_SOURCE,
-                   ttl=C.TRACEROUTE_TTL, timeout=C.TRACEROUTE_TIMEOUT, vrf=C.TRACEROUTE_VRF):
+    def traceroute(self,
+                   destination,
+                   source=C.TRACEROUTE_SOURCE,
+                   ttl=C.TRACEROUTE_TTL,
+                   timeout=C.TRACEROUTE_TIMEOUT,
+                   vrf=C.TRACEROUTE_VRF):
         """
         Executes traceroute on the device and returns a dictionary with the result.
 
@@ -905,7 +975,8 @@ class AOSDriver(NetworkDriver):
         # Calculation to leave enough time for traceroute to complete assumes send_command
         # delay of .2 seconds.
 
-        output, error, retCode = self.device.send_command_std(command, throw_exception=False)
+        output, error, retCode = self.device.send_command_std(
+            command, throw_exception=False)
         traceroute_dict = {}
 
         if retCode != 0:
@@ -914,7 +985,8 @@ class AOSDriver(NetworkDriver):
 
         max_hop = 0
         traceroute_arr = output.splitlines()
-        indices = next((i for i, s in enumerate(traceroute_arr) if 'traceroute to' in s), None)
+        indices = next((i for i, s in enumerate(traceroute_arr)
+                        if 'traceroute to' in s), None)
 
         if indices is None:
             traceroute_dict['error'] = output
@@ -923,21 +995,25 @@ class AOSDriver(NetworkDriver):
         indices = int(indices)
         traceroute_arr = traceroute_arr[indices:]
         results = {}
-        for i in range(indices+1, len(traceroute_arr)):
+        for i in range(indices + 1, len(traceroute_arr)):
             curr_hop_idx = i - indices
             current_hop = traceroute_arr[i]
-            host_matches = re.findall(r"([^ ]+)?\s\((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\)", current_hop)
+            host_matches = re.findall(
+                r"([^ ]+)?\s\((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\)",
+                current_hop)
             rrt_matches = re.findall(r".*?(\d+.?\d*)\s?ms.*?", current_hop)
             if rrt_matches == []:
                 continue
 
             results[curr_hop_idx] = {'probes': {}}
             for index, rrt in enumerate(rrt_matches):
-                hostname, ip_address = host_matches[index] if index < len(host_matches) else ('', '')
-                results[curr_hop_idx]['probes'][index+1] = {'rtt': float(rrt),
-                                                            'ip_address': py23_compat.text_type(ip_address),
-                                                            'host_name': py23_compat.text_type(hostname)
-                                                            }
+                hostname, ip_address = host_matches[
+                    index] if index < len(host_matches) else ('', '')
+                results[curr_hop_idx]['probes'][index + 1] = {
+                    'rtt': float(rrt),
+                    'ip_address': py23_compat.text_type(ip_address),
+                    'host_name': py23_compat.text_type(hostname)
+                }
 
         traceroute_dict['success'] = results
         return traceroute_dict
@@ -948,10 +1024,7 @@ class AOSDriver(NetworkDriver):
         users = {}
         users_arr = re.findall(r".*User name = (.+),", output)
         for user in users_arr:
-            users[user] = {'level': 0,
-                           'password': u'',
-                           'sshkeys': []
-                           }
+            users[user] = {'level': 0, 'password': u'', 'sshkeys': []}
         return users
 
     def get_environment(self):
@@ -980,10 +1053,11 @@ class AOSDriver(NetworkDriver):
             curr_temp = float(temp_tbl.get_column_by_name('Current')[index])
             danger = float(temp_tbl.get_column_by_name('Danger')[index])
             thresh = float(temp_tbl.get_column_by_name('Thresh')[index])
-            environment['temperature'][chassis] = {"temperature": float(curr_temp),
-                                                   "is_alert": (curr_temp > thresh),
-                                                   "is_critical": (curr_temp > danger)
-                                                   }
+            environment['temperature'][chassis] = {
+                "temperature": float(curr_temp),
+                "is_alert": (curr_temp > thresh),
+                "is_critical": (curr_temp > danger)
+            }
 
         # Fans
         command = 'show fan'
@@ -1007,15 +1081,14 @@ class AOSDriver(NetworkDriver):
             total_power_supply = power_tbl.get_column_by_index(1)[index]
             status = power_tbl.get_column_by_name('Status')[index]
             if chassis != 'Total' and chassis != '':
-                environment['power'][chassis] = {'status': (status == 'UP'),
-                                                 'output': 0.0,
-                                                 'capacity': float(total_power_supply)
-                                                 }
+                environment['power'][chassis] = {
+                    'status': (status == 'UP'),
+                    'output': 0.0,
+                    'capacity': float(total_power_supply)
+                }
 
         # Memory is not supported
-        environment['memory'] = {'available_ram': 0,
-                                 'used_ram': 0
-                                 }
+        environment['memory'] = {'available_ram': 0, 'used_ram': 0}
 
         return environment
 
@@ -1045,11 +1118,13 @@ class AOSDriver(NetworkDriver):
         }
 
         comm_tbl = AOSTable(output)
-        for index, comm_str in enumerate(comm_tbl.get_column_by_name('community string')):
+        for index, comm_str in enumerate(
+                comm_tbl.get_column_by_name('community string')):
             username = comm_tbl.get_column_by_name('user name')[index]
-            snmp_dict['community'][comm_str] = {'acl': username,
-                                                'mode': u'unknown'
-                                                }
+            snmp_dict['community'][comm_str] = {
+                'acl': username,
+                'mode': u'unknown'
+            }
         return snmp_dict
 
     def get_config(self, retrieve='all'):
@@ -1074,8 +1149,10 @@ class AOSDriver(NetworkDriver):
             configs['running'] = self._get_config_snapshot()
 
         if retrieve in ('candidate', 'all'):
-            startup_cfg = self._get_startup_config() if retrieve == 'candidate' else configs['startup']
-            running_cfg = self._get_config_snapshot() if retrieve == 'candidate' else configs['running']
+            startup_cfg = self._get_startup_config(
+            ) if retrieve == 'candidate' else configs['startup']
+            running_cfg = self._get_config_snapshot(
+            ) if retrieve == 'candidate' else configs['running']
             diff = compare_configure(startup_cfg, running_cfg)
             configs['candidate'] = '\n'.join(diff)
 
@@ -1127,31 +1204,38 @@ class AOSDriver(NetworkDriver):
             ]
         }
         """
+
         def _get_route_database(destination, route_dict):
             command = 'show ip router database dest {}'.format(destination)
             output = self.device.send_command(command)
             is_active = False
             routes_db_tbl = AOSTable(output)
-            for index, ipaddr in enumerate(routes_db_tbl.get_column_by_name("Destination")):
+            for index, ipaddr in enumerate(
+                    routes_db_tbl.get_column_by_name("Destination")):
                 if destination in ipaddr:
                     route_dict['last_active'] = True
                     if '+' in ipaddr:
                         route_dict['current_active'] = True
                         route_dict['selected_next_hop'] = True
 
-                    interface = routes_db_tbl.get_column_by_name("Interface")[index]
+                    interface = routes_db_tbl.get_column_by_name("Interface")[
+                        index]
                     metric = routes_db_tbl.get_column_by_name("Metric")[index]
                     route_dict['outgoing_interface'] = interface.strip()
-                    route_dict['protocol_attributes']['metric'] = int(metric.strip())
+                    route_dict['protocol_attributes']['metric'] = int(
+                        metric.strip())
                     break
 
         def _get_route_pref(protocol):
             command = 'show ip route-pref'
             output = self.device.send_command(command)
             route_pref = AOSTable(output)
-            for index, _protocol in enumerate(route_pref.get_column_by_name("Protocol")):
+            for index, _protocol in enumerate(
+                    route_pref.get_column_by_name("Protocol")):
                 if _protocol.lower() == protocol.lower():
-                    return int(route_pref.get_column_by_name("Route Preference Value")[index])
+                    return int(
+                        route_pref.get_column_by_name("Route Preference Value")
+                        [index])
             return -1
 
         def _get_bgp_attributes(destination, route_dict):
@@ -1162,26 +1246,36 @@ class AOSDriver(NetworkDriver):
             local_preference = preference2 = 0
 
             if isinstance(bgp_path['Path protocol'], list):
-                indices = next((i for i, s in enumerate(bgp_path['Path protocol']) if 'bgp' in s.lower()), None)
+                indices = next(
+                    (i for i, s in enumerate(bgp_path['Path protocol'])
+                     if 'bgp' in s.lower()), None)
                 indices = int(indices)
                 nextHop = bgp_path['Path neighbor'][indices]['Path nextHop']
-                communities = bgp_path['Path neighbor'][indices]['Path community']
-                local_preference = bgp_path['Path neighbor'][indices]['Path preference degree']
-                as_path = bgp_path['Path neighbor'][indices]['Path autonomous systems']
+                communities = bgp_path['Path neighbor'][indices][
+                    'Path community']
+                local_preference = bgp_path['Path neighbor'][indices][
+                    'Path preference degree']
+                as_path = bgp_path['Path neighbor'][indices][
+                    'Path autonomous systems']
                 preference2 = bgp_path['Path neighbor'][indices]['Path weight']
             else:
                 nextHop = bgp_path['Path neighbor']['Path nextHop']
                 communities = bgp_path['Path neighbor']['Path community']
-                local_preference = bgp_path['Path neighbor']['Path preference degree']
+                local_preference = bgp_path['Path neighbor'][
+                    'Path preference degree']
                 as_path = bgp_path['Path neighbor']['Path autonomous systems']
                 preference2 = bgp_path['Path neighbor']['Path weight']
 
             route_dict['next_hop'] = re.sub(r"[\s,]", '', nextHop)
 
-            route_dict['protocol_attributes']['as_path'] = re.sub(r"[\s,]", '', as_path)
-            route_dict['protocol_attributes']['local_preference'] = re.sub(r"[\s,]", '', local_preference)
-            route_dict['protocol_attributes']['preference2'] = int(re.sub(r"[\s,]", '', preference2))
-            route_dict['protocol_attributes']['communities'].append(re.sub(r"[\s,]", '', communities))
+            route_dict['protocol_attributes']['as_path'] = re.sub(
+                r"[\s,]", '', as_path)
+            route_dict['protocol_attributes']['local_preference'] = re.sub(
+                r"[\s,]", '', local_preference)
+            route_dict['protocol_attributes']['preference2'] = int(
+                re.sub(r"[\s,]", '', preference2))
+            route_dict['protocol_attributes']['communities'].append(
+                re.sub(r"[\s,]", '', communities))
 
         route_dict = {
             'current_active': False,
@@ -1214,7 +1308,8 @@ class AOSDriver(NetworkDriver):
         vrf_tbl = AOSTable(output)
         vrfs = []
 
-        for index, vrf in enumerate(vrf_tbl.get_column_by_name("Virtual Routers")):
+        for index, vrf in enumerate(
+                vrf_tbl.get_column_by_name("Virtual Routers")):
             _protocol = vrf_tbl.get_column_by_name("Protocols")[index].lower()
             if protocol == '' or protocol in _protocol:
                 vrfs.append(vrf.strip())
@@ -1226,9 +1321,12 @@ class AOSDriver(NetworkDriver):
 
         for vrf, command_output in zip(vrfs, commands_output):
             routes_tbl = AOSTable(command_output)
-            for index, ipaddr in enumerate(routes_tbl.get_column_by_name("Dest Address")):
-                _protocol = routes_tbl.get_column_by_name("Protocol")[index].strip().lower()
-                if destination == ipaddr.strip() and (protocol == '' or protocol in _protocol):
+            for index, ipaddr in enumerate(
+                    routes_tbl.get_column_by_name("Dest Address")):
+                _protocol = routes_tbl.get_column_by_name("Protocol")[
+                    index].strip().lower()
+                if destination == ipaddr.strip() and (protocol == '' or
+                                                      protocol in _protocol):
                     c_route_dict = copy.deepcopy(route_dict)
                     c_route_dict['routing_table'] = vrf
                     _get_route_database(destination, c_route_dict)
@@ -1249,7 +1347,8 @@ class AOSDriver(NetworkDriver):
         vrf_tbl = AOSTable(output)
         vrfs = []
 
-        for index, vrf in enumerate(vrf_tbl.get_column_by_name("Virtual Routers")):
+        for index, vrf in enumerate(
+                vrf_tbl.get_column_by_name("Virtual Routers")):
             _protocol = vrf_tbl.get_column_by_name("Protocols")[index].lower()
             if protocol == '' or protocol in _protocol:
                 vrfs.append(vrf.strip())
@@ -1328,10 +1427,9 @@ class AOSDriver(NetworkDriver):
             command = 'vrf {} show ipv6 bgp neighbors'.format(vrf)
             v6_bgp_neighbor_outs.append(self.device.send_command(command))
 
-        for vrf, ip_bgp_out, router_id_out, bgp_neighbor_out, v6_bgp_neighbor_out in zip(vrfs, ip_bgp_outs,
-                                                                                         router_id_outs,
-                                                                                         bgp_neighbor_outs,
-                                                                                         v6_bgp_neighbor_outs):
+        for vrf, ip_bgp_out, router_id_out, bgp_neighbor_out, v6_bgp_neighbor_out in zip(
+                vrfs, ip_bgp_outs, router_id_outs, bgp_neighbor_outs,
+                v6_bgp_neighbor_outs):
             peers = {}
             _vrf = vrf.strip()
             if _vrf == 'default':
@@ -1343,20 +1441,26 @@ class AOSDriver(NetworkDriver):
             result[_vrf] = {'router_id': router_id}
 
             bgp_neighbor_tbl = AOSTable(bgp_neighbor_out)
-            for index, ipaddr in enumerate(bgp_neighbor_tbl.get_column_by_name("Nbr address")):
+            for index, ipaddr in enumerate(
+                    bgp_neighbor_tbl.get_column_by_name("Nbr address")):
                 ipaddr = ipaddr.strip()
                 remote_as = bgp_neighbor_tbl.get_column_by_name("As")[index]
-                remote_id = bgp_neighbor_tbl.get_column_by_name("BGP Id")[index]
+                remote_id = bgp_neighbor_tbl.get_column_by_name("BGP Id")[
+                    index]
                 uptime = bgp_neighbor_tbl.get_column_by_name("Up/Down")[index]
                 enable = True if bgp_neighbor_tbl.get_column_by_name(
-                    "Admin state")[index].lower().strip() == 'enable' else False
+                    "Admin state")[
+                        index].lower().strip() == 'enable' else False
                 is_up = True if bgp_neighbor_tbl.get_column_by_name(
-                    "Oper state")[index].lower().strip() == 'established' else False
+                    "Oper state")[
+                        index].lower().strip() == 'established' else False
 
                 command = 'vrf {} show ip bgp neighbors {}'.format(vrf, ipaddr)
                 bgp_neighbor_out = self.device.send_command(command)
-                bgp_neighbor_dict = parse_block(bgp_neighbor_out, delimiter='=')
-                received_prefixes = str_filter(bgp_neighbor_dict['# of prefixes received'])
+                bgp_neighbor_dict = parse_block(
+                    bgp_neighbor_out, delimiter='=')
+                received_prefixes = str_filter(
+                    bgp_neighbor_dict['# of prefixes received'])
 
                 peer = _PEER_FIELD_MAP_.copy()
                 peer.update({
@@ -1383,19 +1487,26 @@ class AOSDriver(NetworkDriver):
                 peers[ipaddr] = peer
 
             v6_bgp_neighbor_tbl = AOSTable(v6_bgp_neighbor_out)
-            for index, ipaddr in enumerate(v6_bgp_neighbor_tbl.get_column_by_name("Nbr address")):
+            for index, ipaddr in enumerate(
+                    v6_bgp_neighbor_tbl.get_column_by_name("Nbr address")):
                 ipaddr = ipaddr.strip()
                 remote_as = bgp_neighbor_tbl.get_column_by_name("As")[index]
-                remote_id = bgp_neighbor_tbl.get_column_by_name("BGP Id")[index]
+                remote_id = bgp_neighbor_tbl.get_column_by_name("BGP Id")[
+                    index]
                 uptime = bgp_neighbor_tbl.get_column_by_name("Up/Down")[index]
                 enable = True if bgp_neighbor_tbl.get_column_by_name(
-                    "Admin state")[index].lower().strip() == 'enable' else False
+                    "Admin state")[
+                        index].lower().strip() == 'enable' else False
                 is_up = True if bgp_neighbor_tbl.get_column_by_name(
-                    "Oper state")[index].lower().strip() == 'established' else False
+                    "Oper state")[
+                        index].lower().strip() == 'established' else False
 
-                command = 'vrf {} show ipv6 bgp neighbors {}'.format(vrf, ipaddr)
-                bgp_neighbor_dict = parse_block(self.device.send_command(command), delimiter='=')
-                received_prefixes = str_filter(bgp_neighbor_dict['# of prefixes received'])
+                command = 'vrf {} show ipv6 bgp neighbors {}'.format(
+                    vrf, ipaddr)
+                bgp_neighbor_dict = parse_block(
+                    self.device.send_command(command), delimiter='=')
+                received_prefixes = str_filter(
+                    bgp_neighbor_dict['# of prefixes received'])
 
                 peer = _PEER_FIELD_MAP_.copy()
                 peer.update({
@@ -1433,41 +1544,41 @@ class AOSDriver(NetworkDriver):
         """
         result = {}
         _NEIGHBOR_FIELD = {
-                'up': False,
-                'local_as': 0,
-                'remote_as': 0,
-                'router_id': u'',
-                'local_address': u'',
-                'local_address_configured': u'',
-                'local_port': 0,
-                'routing_table': u'',
-                'remote_address': u'',
-                'remote_port': 0,
-                'multihop': 0,
-                'multipath': 0,
-                'remove_private_as': False,
-                'import_policy': u'',
-                'export_policy': u'',
-                'input_messages': 0,
-                'output_messages': 0,
-                'input_updates': 0,
-                'output_updates': 0,
-                'messages_queued_out': 0,
-                'connection_state': u'',
-                'previous_connection_state': u'',
-                'last_event': u'',
-                'suppress_4byte_as': False,
-                'local_as_prepend': False,
-                'holdtime': 0,
-                'configured_holdtime': 0,
-                'keepalive': 0,
-                'configured_keepalive': 0,
-                'active_prefix_count': 0,
-                'received_prefix_count': 0,
-                'accepted_prefix_count': 0,
-                'suppressed_prefix_count': 0,
-                'advertised_prefix_count': 0,
-                'flap_count': 0
+            'up': False,
+            'local_as': 0,
+            'remote_as': 0,
+            'router_id': u'',
+            'local_address': u'',
+            'local_address_configured': u'',
+            'local_port': 0,
+            'routing_table': u'',
+            'remote_address': u'',
+            'remote_port': 0,
+            'multihop': 0,
+            'multipath': 0,
+            'remove_private_as': False,
+            'import_policy': u'',
+            'export_policy': u'',
+            'input_messages': 0,
+            'output_messages': 0,
+            'input_updates': 0,
+            'output_updates': 0,
+            'messages_queued_out': 0,
+            'connection_state': u'',
+            'previous_connection_state': u'',
+            'last_event': u'',
+            'suppress_4byte_as': False,
+            'local_as_prepend': False,
+            'holdtime': 0,
+            'configured_holdtime': 0,
+            'keepalive': 0,
+            'configured_keepalive': 0,
+            'active_prefix_count': 0,
+            'received_prefix_count': 0,
+            'accepted_prefix_count': 0,
+            'suppressed_prefix_count': 0,
+            'advertised_prefix_count': 0,
+            'flap_count': 0
         }
 
         vrfs = self._get_vrfs_by_protocol('bgp')
@@ -1486,128 +1597,205 @@ class AOSDriver(NetworkDriver):
             router_id = str_filter(ip_bgp_dict['BGP Router Id'])
 
             # Ipv4
-            command = 'vrf {} show ip bgp neighbors'.format(vrf, neighbor_address)
+            command = 'vrf {} show ip bgp neighbors'.format(
+                vrf, neighbor_address)
             bgp_neighbor_tbl = AOSTable(self.device.send_command(command))
             neighbors_detail = {}
             for ipaddr in bgp_neighbor_tbl.get_column_by_name("Nbr address"):
                 ipaddr = ipaddr.strip()
                 if neighbor_address == '' or ipaddr == neighbor_address:
-                    command = 'vrf {} show ip bgp neighbors {}'.format(vrf, ipaddr)
+                    command = 'vrf {} show ip bgp neighbors {}'.format(
+                        vrf, ipaddr)
                     bgp_neighbor_out = self.device.send_command(command)
-                    bgp_neighbor_dict = parse_block(bgp_neighbor_out, delimiter='=')
-                    connection_state = str_filter(bgp_neighbor_dict["Neighbor Oper state"])
-                    is_up = True if connection_state.lower() == 'established' else False
-                    remote_as = int(str_filter(bgp_neighbor_dict['Neighbor autonomous system']))
-                    local_addr = str_filter(bgp_neighbor_dict['Neighbor local address'])
+                    bgp_neighbor_dict = parse_block(
+                        bgp_neighbor_out, delimiter='=')
+                    connection_state = str_filter(
+                        bgp_neighbor_dict["Neighbor Oper state"])
+                    is_up = True if connection_state.lower(
+                    ) == 'established' else False
+                    remote_as = int(
+                        str_filter(
+                            bgp_neighbor_dict['Neighbor autonomous system']))
+                    local_addr = str_filter(
+                        bgp_neighbor_dict['Neighbor local address'])
                     local_address_configured = True if local_addr != "" else False
-                    local_port = str_filter(bgp_neighbor_dict['Neighbor local port'])
-                    remote_address = str_filter(bgp_neighbor_dict['Neighbor address'])
+                    local_port = str_filter(
+                        bgp_neighbor_dict['Neighbor local port'])
+                    remote_address = str_filter(
+                        bgp_neighbor_dict['Neighbor address'])
                     multihop = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
                     multipath = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
-                    remove_private_as = False if str_filter(
-                        bgp_neighbor_dict['Neighbor remove private AS']) == 'disabled' else True
-                    received_prefix_count = str_filter(bgp_neighbor_dict['# of prefixes received'])
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
+                    remove_private_as = False if str_filter(bgp_neighbor_dict[
+                        'Neighbor remove private AS']) == 'disabled' else True
+                    received_prefix_count = str_filter(
+                        bgp_neighbor_dict['# of prefixes received'])
 
-                    command = 'vrf {} show ip bgp neighbors timer {}'.format(vrf, ipaddr)
+                    command = 'vrf {} show ip bgp neighbors timer {}'.format(
+                        vrf, ipaddr)
                     bgp_neighbor_timer_out = self.device.send_command(command)
                     bgp_neighbor_timer_tbl = AOSTable(bgp_neighbor_timer_out)
-                    holdtime = bgp_neighbor_timer_tbl.get_column_by_name("Hold")[0]
+                    holdtime = bgp_neighbor_timer_tbl.get_column_by_name(
+                        "Hold")[0]
                     if not holdtime:
                         holdtime = 0
-                    configured_holdtime = bgp_neighbor_timer_tbl.get_column_by_name("Hold(C)")[0]
+                    configured_holdtime = bgp_neighbor_timer_tbl.get_column_by_name(
+                        "Hold(C)")[0]
                     if not configured_holdtime:
                         configured_holdtime = 0
-                    keepalive = bgp_neighbor_timer_tbl.get_column_by_name("Kalive")[0]
+                    keepalive = bgp_neighbor_timer_tbl.get_column_by_name(
+                        "Kalive")[0]
                     if not keepalive:
                         keepalive = 0
-                    configured_keepalive = bgp_neighbor_timer_tbl.get_column_by_name("Ka(C)")[0]
+                    configured_keepalive = bgp_neighbor_timer_tbl.get_column_by_name(
+                        "Ka(C)")[0]
                     if not configured_keepalive:
                         configured_keepalive = 0
 
                     nbg_detail = _NEIGHBOR_FIELD.copy()
                     nbg_detail.update({
-                        'up': is_up,
-                        'local_as': int(local_as),
-                        'remote_as': int(remote_as),
-                        'router_id': router_id,
-                        'local_address': local_addr,
-                        'local_address_configured': local_address_configured,
-                        'local_port': int(local_port),
-                        'routing_table': routing_table,
-                        'remote_address': remote_address,
-                        'multihop': multihop,
-                        'multipath': multipath,
-                        'remove_private_as': remove_private_as,
-                        'connection_state': connection_state,
-                        'holdtime': int(holdtime),
-                        'configured_holdtime': int(configured_holdtime),
-                        'keepalive': int(keepalive),
-                        'configured_keepalive': int(configured_keepalive),
-                        'received_prefix_count': int(received_prefix_count)
+                        'up':
+                        is_up,
+                        'local_as':
+                        int(local_as),
+                        'remote_as':
+                        int(remote_as),
+                        'router_id':
+                        router_id,
+                        'local_address':
+                        local_addr,
+                        'local_address_configured':
+                        local_address_configured,
+                        'local_port':
+                        int(local_port),
+                        'routing_table':
+                        routing_table,
+                        'remote_address':
+                        remote_address,
+                        'multihop':
+                        multihop,
+                        'multipath':
+                        multipath,
+                        'remove_private_as':
+                        remove_private_as,
+                        'connection_state':
+                        connection_state,
+                        'holdtime':
+                        int(holdtime),
+                        'configured_holdtime':
+                        int(configured_holdtime),
+                        'keepalive':
+                        int(keepalive),
+                        'configured_keepalive':
+                        int(configured_keepalive),
+                        'received_prefix_count':
+                        int(received_prefix_count)
                     })
 
                     if remote_as not in neighbors_detail:
                         neighbors_detail[remote_as] = []
                     neighbors_detail[remote_as].append(nbg_detail)
             # Ipv6
-            command = 'vrf {} show ipv6 bgp neighbors'.format(vrf, neighbor_address)
+            command = 'vrf {} show ipv6 bgp neighbors'.format(
+                vrf, neighbor_address)
             v6_bgp_neighbor_tbl = AOSTable(self.device.send_command(command))
 
-            for ipaddr in v6_bgp_neighbor_tbl.get_column_by_name("Nbr address"):
+            for ipaddr in v6_bgp_neighbor_tbl.get_column_by_name(
+                    "Nbr address"):
                 ipaddr = ipaddr.strip()
                 if neighbor_address == '' or ipaddr == neighbor_address:
-                    command = 'vrf {} show ipv6 bgp neighbors {}'.format(vrf, ipaddr)
+                    command = 'vrf {} show ipv6 bgp neighbors {}'.format(
+                        vrf, ipaddr)
                     bgp_neighbor_out = self.device.send_command(command)
-                    bgp_neighbor_dict = parse_block(bgp_neighbor_out, delimiter='=')
-                    connection_state = str_filter(bgp_neighbor_dict["Neighbor Oper state"])
-                    is_up = True if connection_state.lower() == 'established' else False
-                    remote_as = int(str_filter(bgp_neighbor_dict['Neighbor autonomous system']))
-                    local_addr = str_filter(bgp_neighbor_dict['Neighbor local address'])
+                    bgp_neighbor_dict = parse_block(
+                        bgp_neighbor_out, delimiter='=')
+                    connection_state = str_filter(
+                        bgp_neighbor_dict["Neighbor Oper state"])
+                    is_up = True if connection_state.lower(
+                    ) == 'established' else False
+                    remote_as = int(
+                        str_filter(
+                            bgp_neighbor_dict['Neighbor autonomous system']))
+                    local_addr = str_filter(
+                        bgp_neighbor_dict['Neighbor local address'])
                     local_address_configured = True if local_addr != "" else False
-                    local_port = str_filter(bgp_neighbor_dict['Neighbor local port'])
-                    remote_address = str_filter(bgp_neighbor_dict['Neighbor address'])
+                    local_port = str_filter(
+                        bgp_neighbor_dict['Neighbor local port'])
+                    remote_address = str_filter(
+                        bgp_neighbor_dict['Neighbor address'])
                     multihop = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
                     multipath = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
-                    remove_private_as = False if str_filter(
-                        bgp_neighbor_dict['Neighbor remove private AS']) == 'disabled' else True
-                    received_prefix_count = str_filter(bgp_neighbor_dict['# of prefixes received'])
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
+                    remove_private_as = False if str_filter(bgp_neighbor_dict[
+                        'Neighbor remove private AS']) == 'disabled' else True
+                    received_prefix_count = str_filter(
+                        bgp_neighbor_dict['# of prefixes received'])
 
-                    command = 'vrf {} show ipv6 bgp neighbors timer {}'.format(vrf, ipaddr)
+                    command = 'vrf {} show ipv6 bgp neighbors timer {}'.format(
+                        vrf, ipaddr)
                     bgp_neighbor_timer_out = self.device.send_command(command)
                     bgp_neighbor_timer_tbl = AOSTable(bgp_neighbor_timer_out)
-                    holdtime = next((item for item in bgp_neighbor_timer_tbl.get_column_by_name(
-                        "Hold") if item is not None), 0)
-                    configured_holdtime = next((item for item in bgp_neighbor_timer_tbl.get_column_by_name(
-                        "Hold(C)") if item is not None), 0)
-                    keepalive = next((item for item in bgp_neighbor_timer_tbl.get_column_by_name(
-                        "Kalive") if item is not None), 0)
-                    configured_keepalive = next((item for item in bgp_neighbor_timer_tbl.get_column_by_name(
-                        "Ka(C)") if item is not None), 0)
+                    holdtime = next(
+                        (item for item in
+                         bgp_neighbor_timer_tbl.get_column_by_name("Hold")
+                         if item is not None), 0)
+                    configured_holdtime = next(
+                        (item for item in
+                         bgp_neighbor_timer_tbl.get_column_by_name("Hold(C)")
+                         if item is not None), 0)
+                    keepalive = next(
+                        (item for item in
+                         bgp_neighbor_timer_tbl.get_column_by_name("Kalive")
+                         if item is not None), 0)
+                    configured_keepalive = next(
+                        (item for item in
+                         bgp_neighbor_timer_tbl.get_column_by_name("Ka(C)")
+                         if item is not None), 0)
 
                     nbg_detail = _NEIGHBOR_FIELD.copy()
                     nbg_detail.update({
-                        'up': is_up,
-                        'local_as': int(local_as),
-                        'remote_as': int(remote_as),
-                        'router_id': router_id,
-                        'local_address': local_addr,
-                        'local_address_configured': local_address_configured,
-                        'local_port': int(local_port),
-                        'routing_table': routing_table,
-                        'remote_address': remote_address,
-                        'multihop': multihop,
-                        'multipath': multipath,
-                        'remove_private_as': remove_private_as,
-                        'connection_state': connection_state,
-                        'holdtime': int(holdtime),
-                        'configured_holdtime': int(configured_holdtime),
-                        'keepalive': int(keepalive),
-                        'configured_keepalive': int(configured_keepalive),
-                        'received_prefix_count': int(received_prefix_count)
+                        'up':
+                        is_up,
+                        'local_as':
+                        int(local_as),
+                        'remote_as':
+                        int(remote_as),
+                        'router_id':
+                        router_id,
+                        'local_address':
+                        local_addr,
+                        'local_address_configured':
+                        local_address_configured,
+                        'local_port':
+                        int(local_port),
+                        'routing_table':
+                        routing_table,
+                        'remote_address':
+                        remote_address,
+                        'multihop':
+                        multihop,
+                        'multipath':
+                        multipath,
+                        'remove_private_as':
+                        remove_private_as,
+                        'connection_state':
+                        connection_state,
+                        'holdtime':
+                        int(holdtime),
+                        'configured_holdtime':
+                        int(configured_holdtime),
+                        'keepalive':
+                        int(keepalive),
+                        'configured_keepalive':
+                        int(configured_keepalive),
+                        'received_prefix_count':
+                        int(received_prefix_count)
                     })
 
                     if remote_as not in neighbors_detail:
@@ -1663,72 +1851,109 @@ class AOSDriver(NetworkDriver):
             for ipaddr in bgp_neighbor_tbl.get_column_by_name("Nbr address"):
                 ipaddr = ipaddr.strip()
                 if neighbor == '' or ipaddr == neighbor:
-                    command = 'vrf {} show ip bgp neighbors {}'.format(vrf, ipaddr)
+                    command = 'vrf {} show ip bgp neighbors {}'.format(
+                        vrf, ipaddr)
                     bgp_neighbor_out = self.device.send_command(command)
-                    bgp_neighbor_dict = parse_block(bgp_neighbor_out, delimiter='=')
-                    connection_state = str_filter(bgp_neighbor_dict["Neighbor Oper state"])
-                    is_up = True if connection_state.lower() == 'established' else False
-                    local_as = str_filter(bgp_neighbor_dict['Neighbor autonomous system'])
-                    local_addr = str_filter(bgp_neighbor_dict['Neighbor local address'])
+                    bgp_neighbor_dict = parse_block(
+                        bgp_neighbor_out, delimiter='=')
+                    connection_state = str_filter(
+                        bgp_neighbor_dict["Neighbor Oper state"])
+                    is_up = True if connection_state.lower(
+                    ) == 'established' else False
+                    local_as = str_filter(
+                        bgp_neighbor_dict['Neighbor autonomous system'])
+                    local_addr = str_filter(
+                        bgp_neighbor_dict['Neighbor local address'])
                     local_address_configured = True if local_addr != "" else False
-                    local_port = str_filter(bgp_neighbor_dict['Neighbor local port'])
-                    remote_address = str_filter(bgp_neighbor_dict['Neighbor address'])
+                    local_port = str_filter(
+                        bgp_neighbor_dict['Neighbor local port'])
+                    remote_address = str_filter(
+                        bgp_neighbor_dict['Neighbor address'])
                     multihop = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
                     multipath = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
-                    remove_private_as = False if str_filter(
-                        bgp_neighbor_dict['Neighbor remove private AS']) == 'disabled' else True
-                    received_prefix_count = str_filter(bgp_neighbor_dict['# of prefixes received'])
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
+                    remove_private_as = False if str_filter(bgp_neighbor_dict[
+                        'Neighbor remove private AS']) == 'disabled' else True
+                    received_prefix_count = str_filter(
+                        bgp_neighbor_dict['# of prefixes received'])
                     route_reflector_client = False if str_filter(
-                        bgp_neighbor_dict['Neighbor route-reflector-client']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor route-reflector-client']
+                    ).lower() == 'disabled' else True
                     next_hop_self = False if str_filter(
-                        bgp_neighbor_dict['Neighbor next hop self']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor next hop self']).lower(
+                        ) == 'disabled' else True
 
                     peer = _PEER_FIELD_MAP_.copy()
                     peer.update({
-                        'local_address': local_addr,
-                        'local_as': int(local_as),
-                        'remote_as': int(remote_as),
-                        'route_reflector_client': route_reflector_client,
-                        'nhs': next_hop_self,
+                        'local_address':
+                        local_addr,
+                        'local_as':
+                        int(local_as),
+                        'remote_as':
+                        int(remote_as),
+                        'route_reflector_client':
+                        route_reflector_client,
+                        'nhs':
+                        next_hop_self,
                     })
                     group['neighbors'].update({ipaddr: peer})
 
             command = 'vrf {} show ipv6 bgp neighbors'.format(vrf)
             v6_bgp_neighbor_tbl = AOSTable(self.device.send_command(command))
-            for ipaddr in v6_bgp_neighbor_tbl.get_column_by_name("Nbr address"):
+            for ipaddr in v6_bgp_neighbor_tbl.get_column_by_name(
+                    "Nbr address"):
                 ipaddr = ipaddr.strip()
                 if neighbor == '' or ipaddr == neighbor:
-                    command = 'vrf {} show ipv6 bgp neighbors {}'.format(vrf, ipaddr)
+                    command = 'vrf {} show ipv6 bgp neighbors {}'.format(
+                        vrf, ipaddr)
                     bgp_neighbor_out = self.device.send_command(command)
-                    bgp_neighbor_dict = parse_block(bgp_neighbor_out, delimiter='=')
-                    connection_state = str_filter(bgp_neighbor_dict["Neighbor Oper state"])
-                    is_up = True if connection_state.lower() == 'established' else False
-                    local_as = str_filter(bgp_neighbor_dict['Neighbor autonomous system'])
-                    local_addr = str_filter(bgp_neighbor_dict['Neighbor local address'])
+                    bgp_neighbor_dict = parse_block(
+                        bgp_neighbor_out, delimiter='=')
+                    connection_state = str_filter(
+                        bgp_neighbor_dict["Neighbor Oper state"])
+                    is_up = True if connection_state.lower(
+                    ) == 'established' else False
+                    local_as = str_filter(
+                        bgp_neighbor_dict['Neighbor autonomous system'])
+                    local_addr = str_filter(
+                        bgp_neighbor_dict['Neighbor local address'])
                     local_address_configured = True if local_addr != "" else False
-                    local_port = str_filter(bgp_neighbor_dict['Neighbor local port'])
-                    remote_address = str_filter(bgp_neighbor_dict['Neighbor address'])
+                    local_port = str_filter(
+                        bgp_neighbor_dict['Neighbor local port'])
+                    remote_address = str_filter(
+                        bgp_neighbor_dict['Neighbor address'])
                     multihop = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
                     multipath = False if str_filter(
-                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower() == 'disabled' else True
-                    remove_private_as = False if str_filter(
-                        bgp_neighbor_dict['Neighbor remove private AS']) == 'disabled' else True
-                    received_prefix_count = str_filter(bgp_neighbor_dict['# of prefixes received'])
+                        bgp_neighbor_dict['Neighbor EBGP multiHop']).lower(
+                        ) == 'disabled' else True
+                    remove_private_as = False if str_filter(bgp_neighbor_dict[
+                        'Neighbor remove private AS']) == 'disabled' else True
+                    received_prefix_count = str_filter(
+                        bgp_neighbor_dict['# of prefixes received'])
                     route_reflector_client = False if str_filter(
-                        bgp_neighbor_dict['Neighbor route-reflector-client']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor route-reflector-client']
+                    ).lower() == 'disabled' else True
                     next_hop_self = False if str_filter(
-                        bgp_neighbor_dict['Neighbor next hop self']).lower() == 'disabled' else True
+                        bgp_neighbor_dict['Neighbor next hop self']).lower(
+                        ) == 'disabled' else True
 
                     peer = _PEER_FIELD_MAP_.copy()
                     peer.update({
-                        'local_address': local_addr,
-                        'local_as': int(local_as),
-                        'remote_as': int(remote_as),
-                        'route_reflector_client': route_reflector_client,
-                        'nhs': next_hop_self,
+                        'local_address':
+                        local_addr,
+                        'local_as':
+                        int(local_as),
+                        'remote_as':
+                        int(remote_as),
+                        'route_reflector_client':
+                        route_reflector_client,
+                        'nhs':
+                        next_hop_self,
                     })
                     group['neighbors'].update({ipaddr: peer})
 
