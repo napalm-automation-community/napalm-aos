@@ -211,7 +211,7 @@ class AOSDriver(NetworkDriver):
             diff = compare_configure(running_cfg, format_white_space(output), '+')
         return '\n'.join(diff)
 
-    def commit_config(self):
+    def commit_config(self, message=""):
         if self.config_replace:
             boot_dir, boot_file = self._get_boot_config_location()
             self.device.send_command('cp -rf {}/{} {}/{}'.format(self.dest_file_system,
@@ -230,11 +230,13 @@ class AOSDriver(NetworkDriver):
             error = self.device.send_command(removeCmd)
             self.device.send_command('configuration apply {}/{}'.format(self.dest_file_system,
                                                                         self.candidate_cfg_file))
-            listCmd = "ls /flash/{}.* | wc -l".format(self.candidate_cfg_file)
-            if self.device.send_command(listCmd) == '1':
-                raise CommandErrorException("Error: invalid command")
             removecommand = "rm -rf {}".format(self.dest_file_system)
             self.device.send_command(removecommand)
+            listCmd = "ls /flash/{}.* | wc -l".format(self.candidate_cfg_file)
+            if self.device.send_command(listCmd) == '1':
+                openFile = "cat /flash/{}.1.err".format(self.candidate_cfg_file)
+                output = self.device.send_command(openFile, throw_exception=False)
+                raise CommandErrorException(output)
 
     def discard_config(self):
         command = 'rm -rf {}/{}'.format(self.dest_file_system, self.candidate_cfg_file)
