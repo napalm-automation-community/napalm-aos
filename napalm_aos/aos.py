@@ -31,6 +31,7 @@ try:
     from napalm.base.exceptions import (
         ConnectionException,
         MergeConfigException,
+        ReplaceConfigException,
         CommandErrorException,
     )
     from napalm.base.helpers import mac as standardize_mac
@@ -44,6 +45,7 @@ except ImportError:
     from napalm_base.exceptions import (
         ConnectionException,
         MergeConfigException,
+        ReplaceConfigException,
         CommandErrorException,
     )
     from napalm_base.helpers import mac as standardize_mac
@@ -160,17 +162,21 @@ class AOSDriver(NetworkDriver):
         """
         if config and filename:
             raise ReplaceConfigException("No configuration found")
-        self._load_candidate(filename, config)
-        self.config_replace = True
+
+        if config:
+            filename = self._create_tmp_file(config, self.candidate_cfg_file)
+
+        if filename and os.path.exists(filename) is True:
+            command = 'mkdir -p {}'.format(self.dest_file_system)
+            self.device.send_command(command)
+            format_white_space_for_file(filename)
+            self._scp_client.scp_transfer_file(filename, "{}/{}".format(self.dest_file_system,
+                                                                        self.candidate_remote_cfg_file))
+            self.config_replace = True
+        else:
+            raise ReplaceConfigException("Config file is not found")
 
     def load_merge_candidate(self, filename=None, config=None):
-        """
-        SCP file to remote device.
-        """
-        self._load_candidate(filename, config)
-        self.config_replace = False
-
-    def _load_candidate(self, filename=None, config=None):
         """
         SCP file to remote device.
         """
