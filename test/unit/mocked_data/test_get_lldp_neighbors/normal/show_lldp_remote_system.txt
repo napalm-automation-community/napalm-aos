@@ -1,13 +1,22 @@
-Remote LLDP nearest-bridge Agents on Local Port 2/1/1:
+Remote LLDP nearest-bridge Agents on Local Port 1/1/17:
 
-    Chassis e8:e7:32:a2:ab:08, Port 1001:
-      Remote ID                   = 1,
-      Chassis Subtype             = 4 (MAC Address),
+    Chassis 38.32.0.223:128.0.254.16:0.0.0:2.109.165, Port 8875567A36C2:P1:
+      Remote ID                   = 10,
+      Chassis Subtype             = 5 (Network Address),
       Port Subtype                = 7 (Locally assigned),
-      Port Description            = Alcatel-Lucent 1/1,
-      System Name                 = switch96,
-      System Description          = Alcatel-Lucent OS6850E-P24 6.4.6.225.R01 Service Release, December 07, 2014.,
-      Capabilities Supported      = Bridge Router,
-      Capabilities Enabled        = Bridge Router,
-      Management IP Address       = 172.16.92.96
+      Port Description            = SW Port,
+      System Name                 = SEP8875567A36C2.voice.csupomona.net,
+      System Description          = Cisco IP Phone 6921, V5, SCCP 9.4.1.3.SR3,
+      Capabilities Supported      = Bridge Telephone,
+      Capabilities Enabled        = Bridge Telephone,
+      Management IP Address       = 10.105.0.66,
+      MED Device Type             = Endpoint Class III,
+      MED Capabilities            = Capabilities | Power via MDI-PD(33),
+      MED Extension TLVs Present  = Network Policy| Inventory,
+      MED Power Type              = PD Device,
+      MED Power Source            = Unknown,
+      MED Power Priority          = Unknown,
+      MED Power Value             = 4.9 W,
+      Remote port MAC/PHY AutoNeg = Supported Enabled Capability 0x6c00,
+      Mau Type                    = 100BaseTXFD - 2 pair category 5 UTP full duplex mode
 

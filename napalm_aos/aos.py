@@ -320,7 +320,7 @@ class AOSDriver(NetworkDriver):
         """Returns a flag with the state of the SSH connection."""
         return {'is_alive': self.device.is_alive()}
 
-    def get_arp_table(self):
+    def get_arp_table(self, vrf=""):
         """
         Get arp table information.
 
@@ -347,7 +347,11 @@ class AOSDriver(NetworkDriver):
             ]
         """
         arp_table = []
-        command = 'show arp'
+        if not vrf:
+            command = 'show arp'
+        else:
+            command = 'vrf {} show arp'.format(vrf)
+
         output = self.device.send_command(command)
         if len(output.strip()) == 0:
             return {}
@@ -630,8 +634,10 @@ class AOSDriver(NetworkDriver):
             for chassis in lldp_dict[local_port].keys():
                 hostname = lldp_dict[local_port][chassis][
                     'System Name'].strip()
-                port_match = re.match(r".*(Port) (\d+)", chassis)
-                port = port_match.groups()[1]
+                port_match = re.match(r".*(Port) (.+)", chassis)
+                port = ''
+                if port_match and len(port_match.groups()) > 1:
+                    port = port_match.groups()[1]
                 entry = {
                     'hostname': hostname,
                     'port': port,
@@ -671,7 +677,7 @@ class AOSDriver(NetworkDriver):
                         'Capabilities Enabled'].strip()
                     remote_port_description = lldp_dict[local_port][chassis][
                         'Port Description'].strip()
-                    port_match = re.match(r".*(Port) (\d+)", chassis)
+                    port_match = re.match(r".*(Port) (.+)", chassis)
                     if port_match and len(port_match.groups()) > 1:
                         port = port_match.groups()[1]
 
@@ -687,8 +693,8 @@ class AOSDriver(NetworkDriver):
                         'remote_port': port,
                         'remote_port_description': remote_port_description,
                         'remote_system_description': description,
-                        'remote_system_capab': system_capab,
-                        'remote_system_enable_capab': system_enable_capab
+                        'remote_system_capab': [system_capab],
+                        'remote_system_enable_capab': [system_enable_capab]
                     }
                     neighbors.append(entry)
                 lldp[iface] = neighbors
@@ -1138,8 +1144,8 @@ class AOSDriver(NetworkDriver):
 
         Returns the startup or/and running configuration as dictionary.
         The keys of the dictionary represent the type of configuration
-        (startup or running). The candidate is always empty string,
-        since AOS does not support candidate configuration.
+        (startup or running). Please be aware that AOS doesn't directly support candidate configuration.
+        The candidate configuration is just difference between starup and running configuration,
         """
 
         configs = {

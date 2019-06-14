@@ -1,0 +1,9 @@
+
+Total 2 arp entries
+ Flags (P=Proxy, A=Authentication, V=VRRP, B=BFD, H=HAVLAN, I=INTF)
+
+ IP Addr           Hardware Addr       Type       Flags   Port              Interface   Name
+-----------------+-------------------+----------+-------+-----------------+-----------+---------------------------------
+ 10.1.2.89         2c:fa:a2:7e:aa:0f   DYNAMIC                      1/1/24  vlan1002
+ 10.1.2.96         e8:e7:32:a2:ab:08   DYNAMIC                      1/1/24  vlan1002
+
