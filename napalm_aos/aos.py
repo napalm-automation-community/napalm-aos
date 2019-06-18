@@ -792,7 +792,7 @@ class AOSDriver(NetworkDriver):
             synchronized = True if 'synchronization' in server[
                 'Status'] else False
             ntp_stats.append({
-                'remote': server['IP address'].strip(),
+                'remote': server['Host name'].strip(),
                 'synchronized': synchronized,
                 'referenceid': server['Reference IP'].strip(),
                 'stratum': int(server['Stratum']),
