@@ -1,4 +1,4 @@
-IP address         = 192.168.70.251,
+Host name          = 192.168.70.251,
 Host mode          = client,
 Peer mode          = server,
 Prefer             = no,
