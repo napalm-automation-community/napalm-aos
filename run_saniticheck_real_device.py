@@ -49,7 +49,7 @@ jprint(device.get_route_to())
 
 print("get_snmp_information")
 jprint(device.get_snmp_information())
-                                                                                                                 
+
 print("get_users")
 jprint(device.get_users())
 
