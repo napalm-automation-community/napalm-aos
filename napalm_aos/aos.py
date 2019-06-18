@@ -791,8 +791,13 @@ class AOSDriver(NetworkDriver):
             hostpoll = extract_second(server['Minpoll'])
             synchronized = True if 'synchronization' in server[
                 'Status'] else False
+            remote = ""
+            if 'Host name' in server:
+                remote = server['Host name']
+            elif 'IP address' in server:
+                remote = server['IP address']
             ntp_stats.append({
-                'remote': server['Host name'].strip(),
+                'remote': remote.strip(),
                 'synchronized': synchronized,
                 'referenceid': server['Reference IP'].strip(),
                 'stratum': int(server['Stratum']),
