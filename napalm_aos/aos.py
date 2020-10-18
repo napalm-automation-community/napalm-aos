@@ -1142,7 +1142,7 @@ class AOSDriver(NetworkDriver):
             }
         return snmp_dict
 
-    def get_config(self, retrieve='all'):
+    def get_config(self, retrieve='all', full=False, sanitized=False):
         """Implementation of get_config for AOS.
 
         Returns the startup or/and running configuration as dictionary.
@@ -1150,6 +1150,11 @@ class AOSDriver(NetworkDriver):
         (startup or running). Please be aware that AOS doesn't directly support candidate configuration.
         The candidate configuration is just difference between starup and running configuration,
         """
+        if full:
+            logging.warning("get_config: Got non-false value of `full`. Ignoring")
+
+        if sanitized:
+            logging.warning("get_config: Config sanitization not implemented yet!")
 
         configs = {
             'startup': u'',
