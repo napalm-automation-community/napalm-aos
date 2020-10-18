@@ -27,7 +27,6 @@ try:
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
     from napalm.base import NetworkDriver
-    from napalm.base.utils import py23_compat
     from napalm.base.exceptions import (
         ConnectionException,
         MergeConfigException,
@@ -41,7 +40,6 @@ except ImportError:
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
     from napalm_base import NetworkDriver
-    from napalm_base.utils import py23_compat
     from napalm_base.exceptions import (
         ConnectionException,
         MergeConfigException,
@@ -258,7 +256,7 @@ class AOSDriver(NetworkDriver):
         """Write temp file and for use with inline config and SCP."""
         tmp_dir = tempfile.gettempdir()
         if not fname:
-            fname = py23_compat.text_type(uuid.uuid4())
+            fname = str(uuid.uuid4())
         filename = os.path.join(tmp_dir, fname)
         with open(filename, 'wt') as fobj:
             fobj.write(config)
@@ -802,7 +800,7 @@ class AOSDriver(NetworkDriver):
                 'referenceid': server['Reference IP'].strip(),
                 'stratum': int(server['Stratum']),
                 'type': u'',
-                'when': py23_compat.text_type(when),
+                'when': str(when),
                 'hostpoll': int(hostpoll),
                 'reachability': int(server['Reachability'], 16),
                 'delay': float(delay),
@@ -1028,8 +1026,8 @@ class AOSDriver(NetworkDriver):
                     index] if index < len(host_matches) else ('', '')
                 results[curr_hop_idx]['probes'][index + 1] = {
                     'rtt': float(rrt),
-                    'ip_address': py23_compat.text_type(ip_address),
-                    'host_name': py23_compat.text_type(hostname)
+                    'ip_address': str(ip_address),
+                    'host_name': str(hostname)
                 }
 
         traceroute_dict['success'] = results
