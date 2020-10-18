@@ -27,7 +27,6 @@ try:
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
     from napalm.base import NetworkDriver
-    from napalm.base.utils import py23_compat
     from napalm.base.exceptions import (
         ConnectionException,
         MergeConfigException,
@@ -41,7 +40,6 @@ except ImportError:
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
     from napalm_base import NetworkDriver
-    from napalm_base.utils import py23_compat
     from napalm_base.exceptions import (
         ConnectionException,
         MergeConfigException,
@@ -258,7 +256,7 @@ class AOSDriver(NetworkDriver):
         """Write temp file and for use with inline config and SCP."""
         tmp_dir = tempfile.gettempdir()
         if not fname:
-            fname = py23_compat.text_type(uuid.uuid4())
+            fname = str(uuid.uuid4())
         filename = os.path.join(tmp_dir, fname)
         with open(filename, 'wt') as fobj:
             fobj.write(config)
@@ -464,6 +462,7 @@ class AOSDriver(NetworkDriver):
         is_enabled = False
         speed = 0
         description = u''
+        mtu = 0  # `show interfaces` does not give a MTU
 
         command = 'show interfaces'
         output = self.device.send_command(command)
@@ -510,7 +509,8 @@ class AOSDriver(NetworkDriver):
                 'description': description,
                 'mac_address': mac_address,
                 'last_flapped': last_flapped,
-                'speed': speed
+                'speed': speed,
+                'mtu': mtu,
             }
         return interfaces
 
@@ -802,7 +802,7 @@ class AOSDriver(NetworkDriver):
                 'referenceid': server['Reference IP'].strip(),
                 'stratum': int(server['Stratum']),
                 'type': u'',
-                'when': py23_compat.text_type(when),
+                'when': str(when),
                 'hostpoll': int(hostpoll),
                 'reachability': int(server['Reachability'], 16),
                 'delay': float(delay),
@@ -1028,8 +1028,8 @@ class AOSDriver(NetworkDriver):
                     index] if index < len(host_matches) else ('', '')
                 results[curr_hop_idx]['probes'][index + 1] = {
                     'rtt': float(rrt),
-                    'ip_address': py23_compat.text_type(ip_address),
-                    'host_name': py23_compat.text_type(hostname)
+                    'ip_address': str(ip_address),
+                    'host_name': str(hostname)
                 }
 
         traceroute_dict['success'] = results
@@ -1144,7 +1144,7 @@ class AOSDriver(NetworkDriver):
             }
         return snmp_dict
 
-    def get_config(self, retrieve='all'):
+    def get_config(self, retrieve='all', full=False, sanitized=False):
         """Implementation of get_config for AOS.
 
         Returns the startup or/and running configuration as dictionary.
@@ -1152,6 +1152,11 @@ class AOSDriver(NetworkDriver):
         (startup or running). Please be aware that AOS doesn't directly support candidate configuration.
         The candidate configuration is just difference between starup and running configuration,
         """
+        if full:
+            logging.warning("get_config: Got non-false value of `full`. Ignoring")
+
+        if sanitized:
+            logging.warning("get_config: Config sanitization not implemented yet!")
 
         configs = {
             'startup': u'',
@@ -1186,7 +1191,7 @@ class AOSDriver(NetworkDriver):
         startup_cfg = self.device.send_command(command)
         return format_white_space(startup_cfg)
 
-    def get_route_to(self, destination='', protocol=''):
+    def get_route_to(self, destination='', protocol='', longer=False):
         """Implementation of NAPALM method get_route_to.
 
         Returns a dict of dicts
@@ -1221,6 +1226,8 @@ class AOSDriver(NetworkDriver):
             ]
         }
         """
+        if longer:
+            logging.warning("get_route_to: Got non-false value for longer. Ignoring.")
 
         def _get_route_database(destination, route_dict):
             command = 'show ip router database dest {}'.format(destination)
