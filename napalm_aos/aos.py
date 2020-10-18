@@ -1189,7 +1189,7 @@ class AOSDriver(NetworkDriver):
         startup_cfg = self.device.send_command(command)
         return format_white_space(startup_cfg)
 
-    def get_route_to(self, destination='', protocol=''):
+    def get_route_to(self, destination='', protocol='', longer=False):
         """Implementation of NAPALM method get_route_to.
 
         Returns a dict of dicts
@@ -1224,6 +1224,8 @@ class AOSDriver(NetworkDriver):
             ]
         }
         """
+        if longer:
+            logging.warning("get_route_to: Got non-false value for longer. Ignoring.")
 
         def _get_route_database(destination, route_dict):
             command = 'show ip router database dest {}'.format(destination)
