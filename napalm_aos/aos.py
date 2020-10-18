@@ -462,6 +462,7 @@ class AOSDriver(NetworkDriver):
         is_enabled = False
         speed = 0
         description = u''
+        mtu = 0  # `show interfaces` does not give a MTU
 
         command = 'show interfaces'
         output = self.device.send_command(command)
@@ -508,7 +509,8 @@ class AOSDriver(NetworkDriver):
                 'description': description,
                 'mac_address': mac_address,
                 'last_flapped': last_flapped,
-                'speed': speed
+                'speed': speed,
+                'mtu': mtu,
             }
         return interfaces
 
