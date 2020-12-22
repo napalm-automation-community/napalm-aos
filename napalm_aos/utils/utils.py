@@ -8,6 +8,13 @@ import inspect
 import os
 
 
+def string_to_float(s):
+    try:
+        return float(s)
+    except ValueError:
+        return s
+
+
 def to_seconds(time_format):
     seconds = minutes = hours = days = weeks = 0
 
@@ -186,6 +193,39 @@ def parse_block(string, indent=' ', delimiter=':', reverse_delimiter=False):
             key, value = (line.split(delimiter, 1) if not reverse_delimiter else line.rsplit(delimiter, 1))
             level = len(key) - len(key.lstrip(indent))
             prop = {'name': key.strip(), 'value': value, 'level': level}
+            fout.append(prop)
+        except Exception as e:
+            logging.debug('Got exception on parse output block.', exc_info=True)
+
+    return ttree_to_json(fout)
+
+
+def parse_interface_block(string, indent=' ', delimiter=':', reverse_delimiter=False):
+    """
+    Parse
+        Chassis/Slot/Port: 1/1/1
+            status:
+                admin-state: enable
+                operation: enable
+            stats:
+                output: 12
+                input: 12
+    to dict
+        {'Chassis/Slot/Port 1/1/1': {'status':
+            {'admin-state': ' enable', 'operation': ' enable'},
+            'stats': {'output': ' 12', 'input': ' 12'}}}
+    """
+    fout = []
+    string = string.strip()
+    arr_str = string.splitlines()
+    for line in arr_str:
+        try:
+            key, value = (line.split(delimiter, 1) if not reverse_delimiter else line.rsplit(delimiter, 1))
+            level = len(key) - len(key.lstrip(indent))
+            if(level == 0 and value):
+                prop = {'name': key.strip() + " " + value.strip(), 'value': value, 'level': level}
+            else:
+                prop = {'name': key.strip(), 'value': value, 'level': level}
             fout.append(prop)
         except Exception as e:
             logging.debug('Got exception on parse output block.', exc_info=True)

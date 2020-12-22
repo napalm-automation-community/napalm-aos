@@ -218,7 +218,7 @@ class AOSDriver(NetworkDriver):
                                      '+')
         return '\n'.join(diff)
 
-    def commit_config(self, message=""):
+    def commit_config(self):
         if self.config_replace:
             boot_dir, boot_file = self._get_boot_config_location()
             self.device.send_command('cp -rf {}/{} {}/{}'.format(
@@ -320,7 +320,7 @@ class AOSDriver(NetworkDriver):
         """Returns a flag with the state of the SSH connection."""
         return {'is_alive': self.device.is_alive()}
 
-    def get_arp_table(self, vrf=""):
+    def get_arp_table(self):
         """
         Get arp table information.
 
@@ -347,10 +347,7 @@ class AOSDriver(NetworkDriver):
             ]
         """
         arp_table = []
-        if not vrf:
-            command = 'show arp'
-        else:
-            command = 'vrf {} show arp'.format(vrf)
+        command = 'show arp'
 
         output = self.device.send_command(command)
         if len(output.strip()) == 0:
@@ -467,7 +464,7 @@ class AOSDriver(NetworkDriver):
 
         command = 'show interfaces'
         output = self.device.send_command(command)
-        raw_interfaces_dict = parse_block(output)
+        raw_interfaces_dict = parse_interface_block(output)
 
         command = 'show interfaces status'
         output = self.device.send_command(command)
@@ -537,7 +534,7 @@ class AOSDriver(NetworkDriver):
         stdout = self.device.send_command(command)
         stdout = stdout.replace(', ', '\n ')
         stdout = stdout.replace(',', '')
-        raw_interfaces_dict = parse_block(stdout)
+        raw_interfaces_dict = parse_interface_block(stdout)
         for key in raw_interfaces_dict.keys():
             tx_rx = {}
             m_iface = re.findall(INTERFACE_REGEX_1, key)
@@ -693,8 +690,8 @@ class AOSDriver(NetworkDriver):
                         'remote_port': port,
                         'remote_port_description': remote_port_description,
                         'remote_system_description': description,
-                        'remote_system_capab': [system_capab],
-                        'remote_system_enable_capab': [system_enable_capab]
+                        'remote_system_capab': system_capab,
+                        'remote_system_enable_capab': system_enable_capab
                     }
                     neighbors.append(entry)
                 lldp[iface] = neighbors
@@ -784,13 +781,23 @@ class AOSDriver(NetworkDriver):
 
         for server in servers:
             server = parse_block(server, delimiter="=")
-            when = extract_second(server['Uptime count'])
-            delay = extract_second(server['Delay'])
-            offset = extract_second(server['Offset'])
-            jitter = extract_second(server['Dispersion'])
-            hostpoll = extract_second(server['Minpoll'])
-            synchronized = True if 'synchronization' in server[
-                'Status'] else False
+            configured = True
+            if ('Status' in server and server['Status'].strip() == "not configured"):
+                configured = False
+            when, delay, offset, jitter, hostpoll, reference_ip, stratum, reachability = ("", "", "", "", "", "", "", "")
+            if configured:
+                when = extract_second(server['Uptime count'])
+                delay = float(extract_second(server['Delay']))
+                offset = float(extract_second(server['Offset']))
+                jitter = float(extract_second(server['Dispersion']))
+                hostpoll = int(extract_second(server['Minpoll']))
+                reference_ip = server['Reference IP'].strip()
+                stratum = int(server['Stratum'])
+                reachability = int(server['Reachability'], 16)
+            if configured:
+                synchronized = True if 'synchronization' in server['Status'] else False
+            else:
+                synchronized = ""
             remote = ""
             if 'Host name' in server:
                 remote = server['Host name']
@@ -799,15 +806,15 @@ class AOSDriver(NetworkDriver):
             ntp_stats.append({
                 'remote': remote.strip(),
                 'synchronized': synchronized,
-                'referenceid': server['Reference IP'].strip(),
-                'stratum': int(server['Stratum']),
+                'referenceid': reference_ip,
+                'stratum': stratum,
                 'type': u'',
                 'when': py23_compat.text_type(when),
-                'hostpoll': int(hostpoll),
-                'reachability': int(server['Reachability'], 16),
-                'delay': float(delay),
-                'offset': float(offset),
-                'jitter': float(jitter)
+                'hostpoll': hostpoll,
+                'reachability': reachability,
+                'delay': delay,
+                'offset': offset,
+                'jitter': jitter
             })
 
         return ntp_stats
@@ -1101,7 +1108,7 @@ class AOSDriver(NetworkDriver):
                 environment['power'][chassis] = {
                     'status': (status == 'UP'),
                     'output': 0.0,
-                    'capacity': float(total_power_supply)
+                    'capacity': string_to_float(total_power_supply)
                 }
 
         # Memory is not supported
@@ -1507,14 +1514,14 @@ class AOSDriver(NetworkDriver):
             for index, ipaddr in enumerate(
                     v6_bgp_neighbor_tbl.get_column_by_name("Nbr address")):
                 ipaddr = ipaddr.strip()
-                remote_as = bgp_neighbor_tbl.get_column_by_name("As")[index]
-                remote_id = bgp_neighbor_tbl.get_column_by_name("BGP Id")[
+                remote_as = v6_bgp_neighbor_tbl.get_column_by_name("As")[index]
+                remote_id = v6_bgp_neighbor_tbl.get_column_by_name("BGP Id")[
                     index]
-                uptime = bgp_neighbor_tbl.get_column_by_name("Up/Down")[index]
-                enable = True if bgp_neighbor_tbl.get_column_by_name(
+                uptime = v6_bgp_neighbor_tbl.get_column_by_name("Up/Down")[index]
+                enable = True if v6_bgp_neighbor_tbl.get_column_by_name(
                     "Admin state")[
                         index].lower().strip() == 'enable' else False
-                is_up = True if bgp_neighbor_tbl.get_column_by_name(
+                is_up = True if v6_bgp_neighbor_tbl.get_column_by_name(
                     "Oper state")[
                         index].lower().strip() == 'established' else False
 
@@ -1615,7 +1622,7 @@ class AOSDriver(NetworkDriver):
 
             # Ipv4
             command = 'vrf {} show ip bgp neighbors'.format(
-                vrf, neighbor_address)
+                vrf)
             bgp_neighbor_tbl = AOSTable(self.device.send_command(command))
             neighbors_detail = {}
             for ipaddr in bgp_neighbor_tbl.get_column_by_name("Nbr address"):
@@ -1717,7 +1724,7 @@ class AOSDriver(NetworkDriver):
                     neighbors_detail[remote_as].append(nbg_detail)
             # Ipv6
             command = 'vrf {} show ipv6 bgp neighbors'.format(
-                vrf, neighbor_address)
+                vrf)
             v6_bgp_neighbor_tbl = AOSTable(self.device.send_command(command))
 
             for ipaddr in v6_bgp_neighbor_tbl.get_column_by_name(

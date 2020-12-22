@@ -2,9 +2,9 @@
     "2/1/24": [
         {
             "remote_port": "1019",
-            "remote_system_enable_capab": ["Bridge Router"],
+            "remote_system_enable_capab": "Bridge Router",
             "remote_system_name": "switch96",
-            "remote_system_capab": ["Bridge Router"],
+            "remote_system_capab": "Bridge Router",
             "remote_chassis_id": "e8:e7:32:a2:ab:08",
             "remote_port_description": "Alcatel-Lucent 1/19",
             "remote_system_description": "Alcatel-Lucent OS6850E-P24 6.4.6.225.R01 Service Release December 07 2014.",
@@ -14,9 +14,9 @@
     "1/1/24": [
         {
             "remote_port": "1017",
-            "remote_system_enable_capab": ["Bridge Router"],
+            "remote_system_enable_capab": "Bridge Router",
             "remote_system_name": "switch96",
-            "remote_system_capab": ["Bridge Router"],
+            "remote_system_capab": "Bridge Router",
             "remote_chassis_id": "e8:e7:32:a2:ab:08",
             "remote_port_description": "Alcatel-Lucent 1/17",
             "remote_system_description": "Alcatel-Lucent OS6850E-P24 6.4.6.225.R01 Service Release December 07 2014.",
