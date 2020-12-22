@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fs:
 
 setup(
     name="napalm-aos",
-    version="0.2.0",
+    version="0.2.1",
     packages=find_packages(),
     author="Alcatel Lucent Enterprise",
     author_email="ebg_global_supportcenter@al-enterprise.com",
