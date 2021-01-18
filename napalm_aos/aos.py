@@ -297,7 +297,7 @@ class AOSDriver(NetworkDriver):
         # Parse os version and vendor
         description = system_info['Description']
 
-        vendor, os_version = description.split(model_name)
+        vendor, os_version = description.split(" " + model_name + " ")
 
         # Parse interfaces
         interface_data = show_ip_inf.strip().splitlines()
