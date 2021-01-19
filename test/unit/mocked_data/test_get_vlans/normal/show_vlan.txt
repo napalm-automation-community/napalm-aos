@@ -1,0 +1,6 @@
+ vlan    type   admin   oper    ip    mtu          name
+------+-------+-------+------+------+------+------------------
+1      std       Dis     Dis   Dis    1500    default                  
+10     std       Ena     Ena   Dis    1500    vlan10                         
+24     std       Ena     Ena   Dis    1500    vlan24                     
+ 
