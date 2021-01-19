@@ -2092,7 +2092,10 @@ class AOSDriver(NetworkDriver):
         """
         Get vlan details.
 
-        Returns a dict of dicts
+        Returns a dict of dicts:
+        - vlan_id (int)
+            - name (text_type)
+            - interfaces (list) 
 
         Example Output:
         {
@@ -2107,6 +2110,7 @@ class AOSDriver(NetworkDriver):
         }
         """
 
+        dbgMsg()
         vlans = {}
 
         command = 'show vlan'
