@@ -2087,3 +2087,54 @@ class AOSDriver(NetworkDriver):
             optics_detail[iface] = iface_detail
 
         return optics_detail
+
+    def get_vlans(self):
+            """
+            Get vlan details.
+
+            Returns a dict of dicts
+
+            Example Output:
+            {
+                1: {
+                    "name": "vlan1",
+                    "interfaces": ["GigabitEthernet0/0/1", "GigabitEthernet0/0/2"]
+                },
+                2: {
+                    "name": "vlan2",
+                    "interfaces": []
+                }
+            }
+            """
+
+            vlans = {}
+
+            command = 'show vlan'
+            output = self.device.send_command(command)
+            command = 'show ip interface'
+            outputif = self.device.send_command(command)
+            command = 'show ipv6 interface'
+            outputifv6 = self.device.send_command(command)
+
+            vlantable = AOSTable(output)
+            iftable = AOSTable(outputif)
+            ifv6table = AOSTable(outputifv6)
+
+            for index, vlan_name in enumerate(vlantable.get_column_by_name("name")):
+                if_name = []
+                vlan_id = vlantable.get_column_by_name("vlan")[index]
+
+                if "Ena" in vlantable.get_column_by_name("ip")[index]:
+                    for index_if, if_device in enumerate(iftable.get_column_by_name("Device")):
+                        if ("vlan " + vlan_id) in if_device:
+                            if_name.append(iftable.get_column_by_name("Name")[index_if])
+                    for index_ifv6, if_device in enumerate(ifv6table.get_column_by_name("Device")):
+                        if ("vlan " + vlan_id) in if_device:
+                            if_name.append(ifv6table.get_column_by_name("Name")[index_ifv6])
+
+                vlans[vlan_id] = {
+                    "name": vlan_name,
+                    "interfaces": if_name
+                }
+
+            return vlans
