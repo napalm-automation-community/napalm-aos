@@ -2095,7 +2095,7 @@ class AOSDriver(NetworkDriver):
         Returns a dict of dicts:
         - vlan_id (int)
             - name (text_type)
-            - interfaces (list) 
+            - interfaces (list)
 
         Example Output:
         {
