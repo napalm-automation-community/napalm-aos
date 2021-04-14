@@ -1,0 +1,5 @@
+! Chassis:
+system name "0S6860"
+
+! Configuration:
+configuration error-file-limit 2

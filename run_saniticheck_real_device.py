@@ -2,7 +2,8 @@ import napalm as napalm
 from napalm_aos.utils.utils import *
 
 driver = napalm.get_network_driver('aos')
-device = driver(hostname='', username='', password='')
+# device = driver(hostname='10.120.0.123', username='admin', password='switch')
+device = driver(hostname='localhost', username='admin', password='switch', optional_args={'port': 9040})
 device.open()
 
 print("is_alive")
@@ -53,11 +54,17 @@ jprint(device.get_snmp_information())
 print("get_users")
 jprint(device.get_users())
 
+print("get_ipv6_neighbors_table")
+jprint(device.get_ipv6_neighbors_table())
+
+print("get_vlans")
+jprint(device.get_vlans())
+
 print("ping")
-jprint(device.ping(destination="192.168.120.123"))
+jprint(device.ping(destination="10.120.0.123"))
 
 print("traceroute")
-jprint(device.traceroute(destination="192.168.120.123"))
+jprint(device.traceroute(destination="10.120.0.123"))
 
 print("Send command: vlan 700")
 device.cli(["vlan 700"])

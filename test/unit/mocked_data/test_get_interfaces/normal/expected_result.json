@@ -5,6 +5,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d0",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/25": {
@@ -13,6 +14,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:52",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/5": {
@@ -21,6 +23,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:c8",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/17": {
@@ -29,6 +32,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d4",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/26": {
@@ -37,6 +41,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:53",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/21": {
@@ -45,6 +50,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:4e",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/24": {
@@ -53,6 +59,7 @@
         "is_up": true,
         "mac_address": "e8:e7:32:ab:1f:51",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/28": {
@@ -61,6 +68,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:df",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/18": {
@@ -69,6 +77,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:4b",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/12": {
@@ -77,6 +86,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:cf",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/8": {
@@ -85,6 +95,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:41",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/10": {
@@ -93,6 +104,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:43",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/17": {
@@ -101,6 +113,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:4a",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/1": {
@@ -109,6 +122,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:3a",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/7": {
@@ -117,6 +131,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:ca",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/25": {
@@ -125,6 +140,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:dc",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/29": {
@@ -133,6 +149,7 @@
         "is_up": true,
         "mac_address": "e8:e7:32:ab:1f:56",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/6": {
@@ -141,6 +158,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:3f",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/4": {
@@ -149,6 +167,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:3d",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/4": {
@@ -157,6 +176,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:c7",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/3": {
@@ -165,6 +185,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:c6",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/27": {
@@ -173,6 +194,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:de",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/11": {
@@ -181,6 +203,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:44",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": false
     },
     "1/1/3": {
@@ -189,6 +212,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:3c",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/1": {
@@ -197,6 +221,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:c4",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/8": {
@@ -205,6 +230,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:cb",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/14": {
@@ -213,6 +239,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d1",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/27": {
@@ -221,6 +248,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:54",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/13": {
@@ -229,6 +257,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:46",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/7": {
@@ -237,6 +266,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:40",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/21": {
@@ -245,6 +275,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d8",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/2": {
@@ -253,6 +284,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:c5",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/2": {
@@ -261,6 +293,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:3b",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/12": {
@@ -269,6 +302,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:45",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": false
     },
     "2/1/15": {
@@ -277,6 +311,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d2",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/22": {
@@ -285,6 +320,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:4f",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/16": {
@@ -293,6 +329,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d3",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/23": {
@@ -301,6 +338,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:50",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/9": {
@@ -309,6 +347,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:cc",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/19": {
@@ -317,6 +356,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:4c",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/29": {
@@ -325,6 +365,7 @@
         "is_up": true,
         "mac_address": "e8:e7:32:c4:24:e0",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/24": {
@@ -333,6 +374,7 @@
         "is_up": true,
         "mac_address": "e8:e7:32:c4:24:db",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/20": {
@@ -341,6 +383,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:4d",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/14": {
@@ -349,6 +392,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:47",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/22": {
@@ -357,6 +401,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d9",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/26": {
@@ -365,6 +410,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:dd",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/28": {
@@ -373,6 +419,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:55",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/20": {
@@ -381,6 +428,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d7",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/15": {
@@ -389,6 +437,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:48",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/16": {
@@ -397,6 +446,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:49",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/23": {
@@ -405,6 +455,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:da",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/30": {
@@ -413,6 +464,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:57",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/6": {
@@ -421,6 +473,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:c9",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/19": {
@@ -429,6 +482,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:d6",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/5": {
@@ -437,6 +491,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:3e",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/30": {
@@ -445,6 +500,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:e1",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/11": {
@@ -453,6 +509,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:ce",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/10": {
@@ -461,6 +518,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:c4:24:cd",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "1/1/9": {
@@ -469,6 +527,7 @@
         "is_up": false,
         "mac_address": "e8:e7:32:ab:1f:42",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     },
     "2/1/18": {
@@ -477,6 +536,7 @@
         "is_up": true,
         "mac_address": "e8:e7:32:c4:24:d5",
         "last_flapped": -1.0,
+        "mtu": 9216,
         "is_enabled": true
     }
 }

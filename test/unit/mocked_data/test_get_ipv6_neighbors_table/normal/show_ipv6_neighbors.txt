@@ -1,0 +1,6 @@
+Total 2 neighbors
+
+IPv6 Address                                  Hardware Address  Reachability Lifetime    Port                 Interface
+---------------------------------------------+-----------------+------------+-----------+--------------------+--------------------------------
+fe80::2efa:a2ff:fea2:e931                     00:d0:c0:86:12:07 Static          Inactive 1/1/2                test
+fe80::2efa:a2ff:fea2:e93e                     00:d0:c0:86:12:07 Static          Inactive 1/1/5                test

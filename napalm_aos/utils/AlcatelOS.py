@@ -4,13 +4,11 @@ import scp
 import logging
 
 try:
-    from napalm.base.utils import py23_compat
     from napalm.base.exceptions import (
         ConnectionException,
         CommandErrorException,
     )
 except ImportError:
-    from napalm_base.utils import py23_compat
     from napalm_base.exceptions import (
         ConnectionException,
         CommandErrorException,
@@ -121,7 +119,7 @@ class AlcatelOS(object):
         if isinstance(data, int):
             data = chr(data)
         # Ensure unicode
-        return py23_compat.text_type(data)
+        return str(data)
 
     def send_command_non_blocking(self, command, timeout=60, throw_exception=True):
         logging.debug('Executing commands:\n %s' % command)
