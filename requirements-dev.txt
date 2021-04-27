@@ -7,4 +7,5 @@ pytest-pythonpath
 pylama
 mock
 setuptools
+setuptools_rust
 -r requirements.txt
