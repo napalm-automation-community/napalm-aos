@@ -6,6 +6,6 @@ pytest-json
 pytest-pythonpath
 pylama
 mock
-setuptools
+setuptools>=46.1
 setuptools_rust
 -r requirements.txt
