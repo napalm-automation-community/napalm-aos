@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as fs:
 
 setup(
     name="napalm-aos",
-    version="0.2.1",
+    version="0.3.0",
     packages=find_packages(),
     author="Alcatel Lucent Enterprise",
     author_email="ebg_global_supportcenter@al-enterprise.com",
@@ -19,8 +19,8 @@ setup(
     classifiers=[
         'Topic :: Utilities',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6+',
         'Operating System :: POSIX :: Linux',
         'Operating System :: MacOS',
     ],
