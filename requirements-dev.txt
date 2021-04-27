@@ -8,5 +8,5 @@ pylama
 mock
 setuptools>=46.1
 setuptools_rust
-cryptography
+cryptography>=3.1.1
 -r requirements.txt
