@@ -26,8 +26,7 @@ try:
     from netaddr import IPAddress
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
-    from napalm.base import NetworkDriver
-    from napalm.base.utils import py23_compat
+    from napalm.base.base import NetworkDriver
     from napalm.base.exceptions import (
         ConnectionException,
         MergeConfigException,
@@ -41,7 +40,6 @@ except ImportError:
     from napalm_aos.utils.AlcatelOS import *
     from napalm_aos.utils.utils import *
     from napalm_base import NetworkDriver
-    from napalm_base.utils import py23_compat
     from napalm_base.exceptions import (
         ConnectionException,
         MergeConfigException,
@@ -218,7 +216,7 @@ class AOSDriver(NetworkDriver):
                                      '+')
         return '\n'.join(diff)
 
-    def commit_config(self):
+    def commit_config(self, message=''):
         if self.config_replace:
             boot_dir, boot_file = self._get_boot_config_location()
             self.device.send_command('cp -rf {}/{} {}/{}'.format(
@@ -258,7 +256,7 @@ class AOSDriver(NetworkDriver):
         """Write temp file and for use with inline config and SCP."""
         tmp_dir = tempfile.gettempdir()
         if not fname:
-            fname = py23_compat.text_type(uuid.uuid4())
+            fname = str(uuid.uuid4())
         filename = os.path.join(tmp_dir, fname)
         with open(filename, 'wt') as fobj:
             fobj.write(config)
@@ -298,6 +296,8 @@ class AOSDriver(NetworkDriver):
         description = system_info['Description']
 
         vendor, os_version = description.split(model_name)
+        vendor = vendor.strip()
+        os_version = os_version.strip()
 
         # Parse interfaces
         interface_data = show_ip_inf.strip().splitlines()
@@ -320,7 +320,7 @@ class AOSDriver(NetworkDriver):
         """Returns a flag with the state of the SSH connection."""
         return {'is_alive': self.device.is_alive()}
 
-    def get_arp_table(self):
+    def get_arp_table(self, vrf=''):
         """
         Get arp table information.
 
@@ -348,6 +348,7 @@ class AOSDriver(NetworkDriver):
         """
         arp_table = []
         command = 'show arp'
+        if vrf: command = 'vrf ' + vrf +' show arp'
 
         output = self.device.send_command(command)
         if len(output.strip()) == 0:
@@ -501,12 +502,14 @@ class AOSDriver(NetworkDriver):
                     speed = (speed * 1000)
             mac_address = raw_interfaces_dict[key]['MAC address']
             mac_address = mac_address.strip().replace(',', '')
+            mtu: int = int(raw_interfaces_dict[key]['Long Frame Size(Bytes)'].strip()[:-1])
             interfaces[iface] = {
                 'is_enabled': is_enabled,
                 'is_up': is_up,
                 'description': description,
                 'mac_address': mac_address,
                 'last_flapped': last_flapped,
+                'mtu': mtu,
                 'speed': speed
             }
         return interfaces
@@ -651,7 +654,6 @@ class AOSDriver(NetworkDriver):
         lldp = {}
         command = 'show lldp remote-system'
         output = self.device.send_command(command)
-        output = output.replace(',', '')
         output = output.replace('\n\n', '\n')
         output = output.replace('=', ':')
         lldp_dict = parse_block(output, reverse_delimiter=True)
@@ -669,9 +671,11 @@ class AOSDriver(NetworkDriver):
                     description = lldp_dict[local_port][chassis][
                         'System Description'].strip()
                     system_capab = lldp_dict[local_port][chassis][
-                        'Capabilities Supported'].strip()
+                        'Capabilities Supported'].strip().split(', ')
+                    system_capab = list(map(lambda itm: itm.replace(',', ''), system_capab))
                     system_enable_capab = lldp_dict[local_port][chassis][
-                        'Capabilities Enabled'].strip()
+                        'Capabilities Enabled'].strip().split(', ')
+                    system_enable_capab = list(map(lambda itm: itm.replace(',', ''), system_enable_capab))
                     remote_port_description = lldp_dict[local_port][chassis][
                         'Port Description'].strip()
                     port_match = re.match(r".*(Port) (.+)", chassis)
@@ -684,14 +688,14 @@ class AOSDriver(NetworkDriver):
                         remote_chassis_id = rmc[0]
 
                     entry = {
-                        'parent_interface': u'',
-                        'remote_chassis_id': remote_chassis_id,
-                        'remote_system_name': hostname,
                         'remote_port': port,
-                        'remote_port_description': remote_port_description,
-                        'remote_system_description': description,
+                        'remote_system_enable_capab': system_enable_capab,
+                        'remote_system_name': hostname[:-1] if hostname[-1:] == ',' else hostname,
                         'remote_system_capab': system_capab,
-                        'remote_system_enable_capab': system_enable_capab
+                        'remote_chassis_id': remote_chassis_id,
+                        'remote_port_description': remote_port_description[:-1] if remote_port_description[-1:] == ',' else remote_port_description,
+                        'remote_system_description': description[:-1] if description[-1:] == ',' else description,
+                        'parent_interface': u''
                     }
                     neighbors.append(entry)
                 lldp[iface] = neighbors
@@ -809,7 +813,7 @@ class AOSDriver(NetworkDriver):
                 'referenceid': reference_ip,
                 'stratum': stratum,
                 'type': u'',
-                'when': py23_compat.text_type(when),
+                'when': str(when),
                 'hostpoll': hostpoll,
                 'reachability': reachability,
                 'delay': delay,
@@ -1035,8 +1039,8 @@ class AOSDriver(NetworkDriver):
                     index] if index < len(host_matches) else ('', '')
                 results[curr_hop_idx]['probes'][index + 1] = {
                     'rtt': float(rrt),
-                    'ip_address': py23_compat.text_type(ip_address),
-                    'host_name': py23_compat.text_type(hostname)
+                    'ip_address': str(ip_address),
+                    'host_name': str(hostname)
                 }
 
         traceroute_dict['success'] = results
@@ -1151,7 +1155,7 @@ class AOSDriver(NetworkDriver):
             }
         return snmp_dict
 
-    def get_config(self, retrieve='all'):
+    def get_config(self, retrieve='all', full=False, sanitized=False):
         """Implementation of get_config for AOS.
 
         Returns the startup or/and running configuration as dictionary.
@@ -1193,7 +1197,7 @@ class AOSDriver(NetworkDriver):
         startup_cfg = self.device.send_command(command)
         return format_white_space(startup_cfg)
 
-    def get_route_to(self, destination='', protocol=''):
+    def get_route_to(self, destination='', protocol='', longer=False):
         """Implementation of NAPALM method get_route_to.
 
         Returns a dict of dicts
@@ -1331,24 +1335,26 @@ class AOSDriver(NetworkDriver):
 
         vrf_tbl = AOSTable(output)
         vrfs = []
-
         for index, vrf in enumerate(
                 vrf_tbl.get_column_by_name("Virtual Routers")):
             _protocol = vrf_tbl.get_column_by_name("Protocols")[index].lower()
             if protocol == '' or protocol in _protocol:
                 vrfs.append(vrf.strip())
-
         commands_output = []
         for vrf in vrfs:
             command = 'vrf {} show ip routes'.format(vrf)
             commands_output.append(self.device.send_command(command))
-
         for vrf, command_output in zip(vrfs, commands_output):
             routes_tbl = AOSTable(command_output)
             for index, ipaddr in enumerate(
                     routes_tbl.get_column_by_name("Dest Address")):
                 _protocol = routes_tbl.get_column_by_name("Protocol")[
                     index].strip().lower()
+                if routes_tbl.get_column_by_name("Gateway Addr")[index] and not ipaddr:
+                    i = index
+                    while not ipaddr:
+                        ipaddr = routes_tbl.get_column_by_name("Dest Address")[i - 1]
+                        i -= 1
                 if destination == ipaddr.strip() and (protocol == '' or
                                                       protocol in _protocol):
                     c_route_dict = copy.deepcopy(route_dict)
@@ -2087,3 +2093,96 @@ class AOSDriver(NetworkDriver):
             optics_detail[iface] = iface_detail
 
         return optics_detail
+    
+
+    def get_ipv6_neighbors_table(self):
+        """
+        Get IPv6 neighbors table information.
+
+        Return a list of dictionaries having the following set of keys:
+
+            * interface (string)
+            * mac (string)
+            * ip (string)
+            * age (float) in seconds
+            * state (string)
+
+        For example::
+
+            [
+                {
+                    'interface' : 'MgmtEth0/RSP0/CPU0/0',
+                    'mac'       : '5c:5e:ab:da:3c:f0',
+                    'ip'        : '2001:db8:1:1::1',
+                    'age'       : 1454496274.84,
+                    'state'     : 'REACH'
+                },
+                {
+                    'interface': 'MgmtEth0/RSP0/CPU0/0',
+                    'mac'       : '66:0e:94:96:e0:ff',
+                    'ip'        : '2001:db8:1:1::2',
+                    'age'       : 1435641582.49,
+                    'state'     : 'STALE'
+                }
+            ]
+        """
+
+        result = []
+        command = "show ipv6 neighbors"
+        ipv6_neighbors = self.device.send_command(command)
+        ipv6_neighbors_table = AOSTable(ipv6_neighbors)
+        ipv6_addrs = ipv6_neighbors_table.get_column_by_name('IPv6 Address')
+        interfaces = ipv6_neighbors_table.get_column_by_name('Interface')
+        macs = ipv6_neighbors_table.get_column_by_name('Hardware Address')
+        ages = ipv6_neighbors_table.get_column_by_name('Lifetime')
+        states = ipv6_neighbors_table.get_column_by_name('Reachability')
+        
+        for index, ipv6_addr in enumerate(ipv6_addrs):
+            interface = interfaces[index]
+            mac = macs[index]
+            age = ages[index]
+            state = states[index]
+
+            neighbor_dict = {
+                'interface' : interface,
+                'mac'       : mac,
+                'ip'        : ipv6_addr,
+                'age'       : float(to_seconds(age)),
+                'state'     : state
+            }
+            result.append(neighbor_dict)
+
+        return result
+
+    def get_vlans(self):
+        vlans = {}
+
+        command = 'show vlan'
+        output = self.device.send_command(command)
+        command = 'show ip interface'
+        outputif = self.device.send_command(command)
+        command = 'show ipv6 interface'
+        outputifv6 = self.device.send_command(command)
+
+        vlantable = AOSTable(output)
+        iftable = AOSTable(outputif)
+        ifv6table = AOSTable(outputifv6)
+
+        for index, vlan_name in enumerate(vlantable.get_column_by_name("name")):
+            if_name = []
+            vlan_id = vlantable.get_column_by_name("vlan")[index]
+
+            if "Ena" in vlantable.get_column_by_name("ip")[index]:
+                for index_if, if_device in enumerate(iftable.get_column_by_name("Device")):
+                    if ("vlan " + vlan_id) in if_device:
+                        if_name.append(iftable.get_column_by_name("Name")[index_if])
+                for index_ifv6, if_device in enumerate(ifv6table.get_column_by_name("Device")):
+                    if ("vlan " + vlan_id) in if_device:
+                        if_name.append(ifv6table.get_column_by_name("Name")[index_ifv6])
+
+            vlans[vlan_id] = {
+                "name": vlan_name,
+                "interfaces": if_name
+            }
+
+        return vlans

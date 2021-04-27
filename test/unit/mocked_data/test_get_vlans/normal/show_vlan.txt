@@ -1,0 +1,10 @@
+ vlan    type   admin   oper    ip    mtu          name
+------+-------+-------+------+------+------+------------------
+1      std       Ena     Ena   Ena    1500    VLAN 1
+123    std       Ena     Dis   Dis    1500    VLAN 123
+242    std       Ena     Dis   Dis    1500    test test test test test test te
+4000   spb       Ena     Dis   Dis    1524    AutoFabric 7/2/2020 08:18:09
+4001   spb       Ena     Dis   Dis    1524    AutoFabric 7/2/2020 08:18:09
+4002   spb       Ena     Dis   Dis    1524    AutoFabric 3/24/2021 03:08:21
+4003   spb       Ena     Dis   Dis    1524    AutoFabric 3/24/2021 03:08:21
+4094   vcm       Ena     Dis   Dis    1500    VCM IPC

@@ -709,7 +709,7 @@ Chassis/Slot/Port 1/1/29  :
  MAC address            : e8:e7:32:ab:1f:56,
  BandWidth (Megabits)   :    21000,             Duplex           : Full,
  Autonegotiation        :   0  [                              ],
- Long Frame Size(Bytes) : 16360,
+ Long Frame Size(Bytes) : 9216,
  Inter Frame Gap(Bytes) : 12,
  Rx              :
  Bytes Received  :             81065068, Unicast Frames :               119480,
@@ -1459,7 +1459,7 @@ Chassis/Slot/Port 2/1/29  :
  MAC address            : e8:e7:32:c4:24:e0,
  BandWidth (Megabits)   :    21000,             Duplex           : Full,
  Autonegotiation        :   0  [                              ],
- Long Frame Size(Bytes) : 16360,
+ Long Frame Size(Bytes) : 9216,
  Inter Frame Gap(Bytes) : 12,
  Rx              :
  Bytes Received  :            340511523, Unicast Frames :                78755,

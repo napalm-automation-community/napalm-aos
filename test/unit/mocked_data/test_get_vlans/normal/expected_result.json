@@ -1,0 +1,36 @@
+{
+    "1": {
+        "name": "VLAN 1",
+        "interfaces": [
+            "mgmt"
+        ]
+    },
+    "123": {
+        "name": "VLAN 123",
+        "interfaces": []
+    },
+    "242": {
+        "name": "test test test t",
+        "interfaces": []
+    },
+    "4000": {
+        "name": "AutoFabric 7/2/2",
+        "interfaces": []
+    },
+    "4001": {
+        "name": "AutoFabric 7/2/2",
+        "interfaces": []
+    },
+    "4002": {
+        "name": "AutoFabric 3/24/",
+        "interfaces": []
+    },
+    "4003": {
+        "name": "AutoFabric 3/24/",
+        "interfaces": []
+    },
+    "4094": {
+        "name": "VCM IPC",
+        "interfaces": []
+    }
+}

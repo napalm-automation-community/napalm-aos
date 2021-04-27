@@ -1,0 +1,17 @@
+[
+    {
+        "interface": "test",
+        "mac": "00:d0:c0:86:12:07",
+        "ip": "fe80::2efa:a2ff:fea2:e931",
+        "age": 0,
+        "state": "Static"
+    },
+    {
+        "interface": "test",
+        "mac": "00:d0:c0:86:12:07",
+        "ip": "fe80::2efa:a2ff:fea2:e93e",
+        "age": 0,
+        "state": "Static"
+    }
+]
+
